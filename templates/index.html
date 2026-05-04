@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="hero-section">
+    <div class="container text-center">
+        <h1 class="display-4 fw-bold mb-3">Premium Cooking Utensils</h1>
+        <p class="lead mb-4">Quality kitchen tools delivered to your doorstep in Nigeria 🇳🇬</p>
+        <a href="/products" class="btn btn-terracotta btn-lg">Shop Now</a>
+    </div>
+</section>
+
+<section class="container my-5">
+    <h2 class="text-center mb-4">Featured Products</h2>
+    <div class="row">
+        {% for product in products %}
+        <div class="col-md-3">
+            <div class="product-card">
+                <div class="product-image">
+                    <i class="fas fa-{{ product.image }} fa-3x"></i>
+                </div>
+                <div class="p-3">
+                    <h5>{{ product.name }}</h5>
+                    <p class="text-muted">{{ product.description[:50] }}</p>
+                    <p class="fw-bold text-terracotta fs-4">₦{{ "{:,.0f}".format(product.price) }}</p>
+                    <button class="btn btn-terracotta w-100" onclick="addToCart({{ product.id }})">
+                        <i class="fas fa-shopping-cart"></i> Add to Cart
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

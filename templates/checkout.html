@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Checkout - Golden Kitchen Nigeria{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-7">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Shipping Information</h4>
+                    <form method="POST" action="/place-order">
+                        <div class="mb-3">
+                            <label class="form-label">Full Name *</label>
+                            <input type="text" name="name" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email *</label>
+                            <input type="email" name="email" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Phone Number *</label>
+                            <input type="tel" name="phone" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Delivery Address *</label>
+                            <textarea name="address" class="form-control" rows="3" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">State *</label>
+                            <select name="state" class="form-select" required>
+                                <option value="">Select State</option>
+                                <option>Lagos</option><option>Abuja FCT</option><option>Rivers</option>
+                                <option>Ogun</option><option>Oyo</option><option>Kano</option>
+                                <option>Others</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Payment Method *</label>
+                            <select name="payment" class="form-select" required>
+                                <option>Cash on Delivery</option>
+                                <option>Bank Transfer</option>
+                                <option>Card Payment</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-terracotta w-100">Place Order</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-5">
+            <div class="card">
+                <div class="card-body">
+                    <h4>Order Summary</h4>
+                    <hr>
+                    <p>Your order will be processed after confirmation.</p>
+                    <div class="alert alert-info">
+                        <i class="fas fa-truck"></i> Free shipping on orders over ₦50,000
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

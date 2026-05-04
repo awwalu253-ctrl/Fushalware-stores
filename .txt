@@ -1,0 +1,12 @@
+your-project/
+├── api/
+│   └── index.py
+├── templates/
+│   ├── base.html
+│   ├── index.html
+│   ├── products.html
+│   ├── cart.html
+│   ├── login.html
+│   └── register.html
+├── requirements.txt
+└── vercel.json
