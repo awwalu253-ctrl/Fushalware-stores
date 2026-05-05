@@ -1,21 +1,27 @@
+import sys
+import os
+
+# Add the parent directory to path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from flask import Flask, render_template, request, session, redirect, url_for, flash, jsonify, send_file
 from flask_login import LoginManager, current_user, login_user, logout_user, login_required
-import os
+from datetime import datetime, timedelta
+import secrets
 import json
 import csv
 import io
-from datetime import datetime, timedelta
-import secrets
-import uuid
 
-# Create Flask app FIRST
+# Create Flask app
 app = Flask(__name__, template_folder='../templates')
 app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
 
-# Initialize Flask-Login AFTER app is created
+# Flask-Login setup
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
+
+# ... rest of your code
 login_manager.login_message = 'Please log in to access this page.'
 
 # User loader callback
