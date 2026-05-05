@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Newsletter - Admin{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <h1 class="mb-4">Newsletter Subscribers</h1>
+    
+    <div class="row">
+        <div class="col-md-5">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Send Campaign</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="/admin/send-newsletter">
+                        <div class="mb-3">
+                            <label class="form-label">Subject</label>
+                            <input type="text" name="subject" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Message</label>
+                            <textarea name="message" class="form-control" rows="5" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-terracotta w-100">Send to {{ subscribers|length }} Subscribers</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-7">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Subscribers List ({{ subscribers|length }})</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-sm mb-0">
+                            <thead>
+                                <tr><th>Email</th><th>Subscribed Date</th><th></th></tr>
+                            </thead>
+                            <tbody>
+                                {% for sub in subscribers %}
+                                <tr>
+                                    <td>{{ sub }}</td>
+                                    <td>-</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-danger" onclick="removeSubscriber('{{ sub }}')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function removeSubscriber(email) {
+    if(confirm('Remove this subscriber?')) {
+        fetch(`/admin/remove-subscriber/${email}`, {method: 'POST'})
+            .then(() => location.reload());
+    }
+}
+</script>
+{% endblock %}

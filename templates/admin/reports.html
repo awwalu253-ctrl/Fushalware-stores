@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Sales Reports - Admin{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <h1 class="mb-4">Sales Reports</h1>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Sales by Day</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr><th>Date</th><th>Sales (₦)</th><th>Orders</th></tr>
+                            </thead>
+                            <tbody>
+                                {% for date, amount in sales_by_day.items() %}
+                                <tr>
+                                    <td>{{ date }}</td>
+                                    <td>₦{{ "{:,.0f}".format(amount) }}</td>
+                                    <td>-</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <a href="/admin/export-products" class="btn btn-outline-terracotta w-100 mb-2">
+                        <i class="fas fa-download"></i> Export Products CSV
+                    </a>
+                    <a href="/admin/export-orders" class="btn btn-outline-terracotta w-100 mb-2">
+                        <i class="fas fa-download"></i> Export Orders CSV
+                    </a>
+                    <a href="/admin/export-customers" class="btn btn-outline-terracotta w-100">
+                        <i class="fas fa-download"></i> Export Customers CSV
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}  

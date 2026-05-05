@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Coupons - Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Manage Coupons</h1>
+        <button class="btn btn-terracotta" data-bs-toggle="modal" data-bs-target="#addCouponModal">
+            <i class="fas fa-plus"></i> Add Coupon
+        </button>
+    </div>
+    
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Code</th>
+                            <th>Description</th>
+                            <th>Discount</th>
+                            <th>Min Order</th>
+                            <th>Used/Limit</th>
+                            <th>Expiry</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for coupon in coupons %}
+                        <tr>
+                            <td><strong>{{ coupon.code }}</strong></td>
+                            <td>{{ coupon.description }}</td>
+                            <td>
+                                {% if coupon.discount_type == 'percentage' %}
+                                    {{ coupon.discount_value }}% off
+                                {% else %}
+                                    ₦{{ "{:,.0f}".format(coupon.discount_value) }} off
+                                {% endif %}
+                             </td>
+                            <td>₦{{ "{:,.0f}".format(coupon.min_order) }}</td>
+                            <td>{{ coupon.used_count }}/{{ coupon.usage_limit or '∞' }}</td>
+                            <td>{{ coupon.expiry_date[:10] if coupon.expiry_date else 'Never' }}</td>
+                            <td>
+                                {% if coupon.active %}
+                                    <span class="badge bg-success">Active</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Disabled</span>
+                                {% endif %}
+                             </td>
+                            <td>
+                                <form method="POST" action="/admin/coupons/toggle/{{ coupon.id }}" style="display:inline">
+                                    <button class="btn btn-sm btn-warning">
+                                        <i class="fas fa-{{ 'toggle-on' if coupon.active else 'toggle-off' }}"></i>
+                                    </button>
+                                </form>
+                             </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Coupon Modal -->
+<div class="modal fade" id="addCouponModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New Coupon</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="/admin/coupons/add">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Coupon Code</label>
+                        <input type="text" name="code" class="form-control" required>
+                        <small class="text-muted">Will be converted to uppercase</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <input type="text" name="description" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Discount Type</label>
+                        <select name="discount_type" class="form-select">
+                            <option value="percentage">Percentage (%)</option>
+                            <option value="fixed">Fixed Amount (₦)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Discount Value</label>
+                        <input type="number" name="discount_value" class="form-control" step="1" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Minimum Order Amount</label>
+                        <input type="number" name="min_order" class="form-control" value="0">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Usage Limit</label>
+                        <input type="number" name="usage_limit" class="form-control" placeholder="Unlimited">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Expiry Date</label>
+                        <input type="date" name="expiry_date" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-terracotta">Add Coupon</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

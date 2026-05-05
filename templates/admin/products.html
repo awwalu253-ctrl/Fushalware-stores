@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Products - Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Manage Products</h1>
+        <div>
+            <a href="/admin/export-products" class="btn btn-outline-terracotta me-2">
+                <i class="fas fa-download"></i> Export CSV
+            </a>
+            <a href="/admin/products/add" class="btn btn-terracotta">
+                <i class="fas fa-plus"></i> Add Product
+            </a>
+        </div>
+    </div>
+    
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Image</th>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Stock</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in products %}
+                        <tr>
+                            <td>{{ product.id }}</td>
+                            <td>
+                                <i class="fas fa-{{ product.image }} fa-2x" style="color: #E67E22;"></i>
+                            </td>
+                            <td><strong>{{ product.name }}</strong></td>
+                            <td>{{ product.category }}</td>
+                            <td>₦{{ "{:,.0f}".format(product.price) }}</td>
+                            <td class="{% if product.stock < 10 %}text-danger fw-bold{% endif %}">
+                                {{ product.stock }}
+                            </td>
+                            <td>
+                                {% if product.featured %}
+                                    <span class="badge bg-info">Featured</span>
+                                {% endif %}
+                                {% if product.bestseller %}
+                                    <span class="badge bg-warning">Best Seller</span>
+                                {% endif %}
+                             </td>
+                            <td>
+                                <a href="/admin/products/edit/{{ product.id }}" class="btn btn-sm btn-warning">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <form method="POST" action="/admin/products/delete/{{ product.id }}" style="display:inline" 
+                                      onsubmit="return confirm('Delete this product?')">
+                                    <button class="btn btn-sm btn-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                             </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

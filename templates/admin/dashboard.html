@@ -1,0 +1,267 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Golden Kitchen Nigeria{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Admin Dashboard</h1>
+        <div class="dropdown">
+            <button class="btn btn-terracotta dropdown-toggle" data-bs-toggle="dropdown">
+                <i class="fas fa-chart-line"></i> Last 30 Days
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="#">Last 7 Days</a></li>
+                <li><a class="dropdown-item" href="#">Last 30 Days</a></li>
+                <li><a class="dropdown-item" href="#">Last Year</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted">Total Sales</h6>
+                            <h3 class="mb-0">₦{{ "{:,.0f}".format(stats.total_sales) }}</h3>
+                        </div>
+                        <div class="bg-warning bg-opacity-10 p-3 rounded-circle">
+                            <i class="fas fa-naira-sign fa-2x text-warning"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted">Total Orders</h6>
+                            <h3 class="mb-0">{{ stats.total_orders }}</h3>
+                        </div>
+                        <div class="bg-primary bg-opacity-10 p-3 rounded-circle">
+                            <i class="fas fa-shopping-cart fa-2x text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted">Customers</h6>
+                            <h3 class="mb-0">{{ total_customers }}</h3>
+                        </div>
+                        <div class="bg-success bg-opacity-10 p-3 rounded-circle">
+                            <i class="fas fa-users fa-2x text-success"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted">Products</h6>
+                            <h3 class="mb-0">{{ total_products }}</h3>
+                            <small class="text-danger">({{ low_stock|length }} low stock)</small>
+                        </div>
+                        <div class="bg-info bg-opacity-10 p-3 rounded-circle">
+                            <i class="fas fa-box fa-2x text-info"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Sales Overview (Last 7 Days)</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="salesChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Low Stock Alert</h5>
+                </div>
+                <div class="card-body">
+                    {% if low_stock %}
+                    <div class="list-group list-group-flush">
+                        {% for product in low_stock %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>{{ product.name }}</span>
+                            <span class="badge bg-danger rounded-pill">{{ product.stock }} left</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center">All products in stock</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mt-4">
+        <div class="card-header">
+            <h5>Sales Overview (Last 7 Days)</h5>
+        </div>
+        <div class="card-body">
+            <canvas id="salesChart" height="200"></canvas>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const ctx = document.getElementById('salesChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: {{ chart_labels| tojson }},
+            datasets: [{
+                label: 'Sales (₦)',
+                data: {{ chart_data| tojson }},
+            borderColor: '#E67E22',
+            backgroundColor: 'rgba(230,126,34,0.1)',
+            fill: true
+        }]
+    }
+});
+    </script>
+
+    <!-- Quick Actions -->
+    <div class="row g-4">
+        <div class="col-md-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <a href="/admin/products/add" class="btn btn-outline-terracotta w-100 py-3">
+                                <i class="fas fa-plus fa-2x d-block mb-2"></i> Add Product
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="/admin/orders" class="btn btn-outline-terracotta w-100 py-3">
+                                <i class="fas fa-truck fa-2x d-block mb-2"></i> Manage Orders
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="/admin/coupons" class="btn btn-outline-terracotta w-100 py-3">
+                                <i class="fas fa-ticket-alt fa-2x d-block mb-2"></i> Create Coupon
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="/admin/export-products" class="btn btn-outline-terracotta w-100 py-3">
+                                <i class="fas fa-download fa-2x d-block mb-2"></i> Export Products
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-4">
+    <div class="card-header bg-warning">
+        <h5 class="mb-0">⚠️ Low Stock Alert</h5>
+    </div>
+    <div class="card-body">
+        {% if low_stock %}
+        <div class="list-group">
+            {% for product in low_stock %}
+            <div class="list-group-item d-flex justify-content-between">
+                <span>{{ product.name }}</span>
+                <span class="badge bg-danger">Only {{ product.stock }} left</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-success mb-0">All products are well stocked!</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card mt-4">
+    <div class="card-header">
+        <h5 class="mb-0">Recent Orders</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-sm mb-0">
+                <thead>
+                    <tr>
+                        <th>Order #</th>
+                        <th>Customer</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in recent_orders %}
+                    <tr>
+                        <td>{{ order.order_number }}</td>
+                        <td>{{ order.customer_name }}</td>
+                        <td>₦{{ "{:,.0f}".format(order.total_amount) }}</td>
+                        <td><span class="badge bg-warning">{{ order.status }}</span></td>
+                        <td>{{ order.created_at[:10] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('salesChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ chart_dates| tojson }},
+        datasets: [{
+            label: 'Sales (₦)',
+            data: {{ chart_sales| tojson }},
+        borderColor: '#E67E22',
+        backgroundColor: 'rgba(230,126,34,0.1)',
+        tension: 0.4,
+        fill: true
+        }]
+    },
+        options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+            tooltip: {
+                callbacks: {
+                    label: function (context) {
+                        return '₦' + context.raw.toLocaleString();
+                    }
+                }
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

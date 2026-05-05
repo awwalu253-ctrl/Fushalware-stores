@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Product - Admin{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">Edit Product: {{ product.name }}</h5>
+        </div>
+        <div class="card-body">
+            <form method="POST">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Product Name *</label>
+                        <input type="text" name="name" class="form-control" value="{{ product.name }}" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Category *</label>
+                        <select name="category" class="form-select" required>
+                            <option value="Knives" {% if product.category == 'Knives' %}selected{% endif %}>Knives</option>
+                            <option value="Pans" {% if product.category == 'Pans' %}selected{% endif %}>Pans</option>
+                            <option value="Pots" {% if product.category == 'Pots' %}selected{% endif %}>Pots</option>
+                            <option value="Utensils" {% if product.category == 'Utensils' %}selected{% endif %}>Utensils</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Price (₦) *</label>
+                        <input type="number" name="price" class="form-control" step="100" value="{{ product.price }}" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Compare Price</label>
+                        <input type="number" name="compare_price" class="form-control" step="100" value="{{ product.compare_price or '' }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Stock Quantity *</label>
+                        <input type="number" name="stock" class="form-control" value="{{ product.stock }}" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Icon/Image</label>
+                        <select name="image" class="form-select">
+                            <option value="knife" {% if product.image == 'knife' %}selected{% endif %}>Knife</option>
+                            <option value="pan" {% if product.image == 'pan' %}selected{% endif %}>Pan</option>
+                            <option value="pot" {% if product.image == 'pot' %}selected{% endif %}>Pot</option>
+                            <option value="utensil" {% if product.image == 'utensil' %}selected{% endif %}>Utensil</option>
+                            <option value="cup" {% if product.image == 'cup' %}selected{% endif %}>Cup</option>
+                            <option value="cutting-board" {% if product.image == 'cutting-board' %}selected{% endif %}>Cutting Board</option>
+                        </select>
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <label class="form-label">Description *</label>
+                        <textarea name="description" class="form-control" rows="4" required>{{ product.description }}</textarea>
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" name="featured" id="featured" {% if product.featured %}checked{% endif %}>
+                            <label class="form-check-label">Featured Product</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" name="bestseller" id="bestseller" {% if product.bestseller %}checked{% endif %}>
+                            <label class="form-check-label">Best Seller</label>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div class="d-flex justify-content-between">
+                    <a href="/admin/products" class="btn btn-outline-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-terracotta">Update Product</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

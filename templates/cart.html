@@ -5,84 +5,173 @@
 {% block content %}
 <div class="container my-5">
     <h1 class="mb-4">Shopping Cart</h1>
+    
     {% if cart_items %}
         <div class="row">
-            <div class="col-md-8">
-                {% for item in cart_items %}
-                <div class="card mb-3">
-                    <div class="card-body">
-                        <div class="row align-items-center">
-                            <div class="col-md-5">
-                                <h5>{{ item.product.name }}</h5>
-                                <p class="text-muted mb-0">₦{{ "{:,.0f}".format(item.product.price) }} each</p>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="d-flex align-items-center">
-                                    <button class="btn btn-sm btn-outline-secondary" onclick="updateQty({{ item.product.id }}, {{ item.quantity - 1 }})">-</button>
-                                    <span class="mx-3">{{ item.quantity }}</span>
-                                    <button class="btn btn-sm btn-outline-secondary" onclick="updateQty({{ item.product.id }}, {{ item.quantity + 1 }})">+</button>
-                                </div>
-                            </div>
-                            <div class="col-md-3 text-end">
-                                <p class="fw-bold mb-0 fs-5">₦{{ "{:,.0f}".format(item.total) }}</p>
-                            </div>
-                            <div class="col-md-1 text-end">
-                                <button class="btn btn-sm btn-danger" onclick="removeItem({{ item.product.id }})">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Price</th>
+                                        <th>Quantity</th>
+                                        <th>Total</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in cart_items %}
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-{{ item.product.image }} fa-2x me-3" style="color: #E67E22;"></i>
+                                                <div>
+                                                    <h6 class="mb-0">{{ item.product.name }}</h6>
+                                                    <small class="text-muted">{{ item.product.category }}</small>
+                                                </div>
+                                            </div>
+                                          </td>
+                                          <td>₦{{ "{:,.0f}".format(item.product.price) }}</td>
+                                          <td>
+                                            <div class="quantity-control d-flex align-items-center">
+                                                <button class="btn btn-sm btn-outline-secondary" onclick="updateQuantity({{ item.product.id }}, {{ item.quantity - 1 }})">-</button>
+                                                <span class="mx-3" style="min-width: 30px; text-align: center;">{{ item.quantity }}</span>
+                                                <button class="btn btn-sm btn-outline-secondary" onclick="updateQuantity({{ item.product.id }}, {{ item.quantity + 1 }})">+</button>
+                                            </div>
+                                          </td>
+                                          <td class="fw-bold">₦{{ "{:,.0f}".format(item.total) }}</td>
+                                          <td>
+                                            <button class="btn btn-sm btn-danger" onclick="removeItem({{ item.product.id }})">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                          </td>
+                                      </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
-                {% endfor %}
+                
+                <div class="d-flex justify-content-between mt-4">
+                    <a href="/products" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i> Continue Shopping
+                    </a>
+                    <button class="btn btn-outline-danger" onclick="clearCart()">
+                        <i class="fas fa-trash-alt me-2"></i> Clear Cart
+                    </button>
+                </div>
             </div>
-            <div class="col-md-4">
-                <div class="card">
+            
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm">
                     <div class="card-body">
-                        <h4>Order Summary</h4>
+                        <h5 class="card-title">Order Summary</h5>
                         <hr>
-                        <div class="d-flex justify-content-between mb-3">
+                        <div class="d-flex justify-content-between mb-2">
                             <span>Subtotal:</span>
                             <span>₦{{ "{:,.0f}".format(total) }}</span>
                         </div>
-                        <div class="d-flex justify-content-between mb-3">
+                        
+                        {% if discount > 0 %}
+                        <div class="d-flex justify-content-between mb-2 text-success">
+                            <span>Discount ({{ coupon.code }}):</span>
+                            <span>-₦{{ "{:,.0f}".format(discount) }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>After Discount:</span>
+                            <span>₦{{ "{:,.0f}".format(final_total) }}</span>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="d-flex justify-content-between mb-2">
                             <span>Shipping:</span>
                             <span>Calculated at checkout</span>
                         </div>
                         <hr>
                         <div class="d-flex justify-content-between mb-3">
-                            <span class="fw-bold">Total:</span>
-                            <span class="fw-bold fs-5 text-terracotta">₦{{ "{:,.0f}".format(total) }}</span>
+                            <strong>Total:</strong>
+                            <strong class="fs-5" style="color: #E67E22;">₦{{ "{:,.0f}".format(final_total) }}</strong>
                         </div>
-                        <a href="/checkout" class="btn btn-terracotta w-100">Proceed to Checkout</a>
-                        <a href="/products" class="btn btn-outline-secondary w-100 mt-2">Continue Shopping</a>
+                        
+                        <!-- Coupon Section -->
+                        <div class="coupon-section mt-3 pt-2 border-top">
+                            <h6><i class="fas fa-ticket-alt"></i> Apply Coupon</h6>
+                            <form id="couponForm" method="POST" action="/apply-coupon" class="mt-2">
+                                <div class="input-group">
+                                    <input type="text" name="coupon_code" class="form-control" placeholder="Enter coupon code" id="couponCode">
+                                    <button class="btn btn-outline-terracotta" type="submit">Apply</button>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        {% if coupon %}
+                        <div class="alert alert-success mt-3 py-2">
+                            <i class="fas fa-check-circle"></i> Coupon applied: <strong>{{ coupon.code }}</strong>
+                            <button type="button" class="btn-close btn-sm float-end" onclick="removeCoupon()"></button>
+                        </div>
+                        {% endif %}
+                        
+                        <a href="/checkout" class="btn btn-terracotta w-100 mt-4">
+                            <i class="fas fa-lock me-2"></i> Proceed to Checkout
+                        </a>
+                        
+                        <div class="text-center mt-3">
+                            <small class="text-muted">
+                                <i class="fab fa-cc-visa"></i> <i class="fab fa-cc-mastercard"></i>
+                                <i class="fab fa-cc-paypal"></i> <i class="fas fa-money-bill-wave"></i>
+                            </small>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     {% else %}
         <div class="text-center py-5">
-            <i class="fas fa-shopping-cart fa-4x text-muted mb-3"></i>
+            <i class="fas fa-shopping-cart fa-5x text-muted mb-4"></i>
             <h3>Your cart is empty</h3>
-            <p>Looks like you haven't added any items to your cart yet.</p>
-            <a href="/products" class="btn btn-terracotta mt-3">Start Shopping</a>
+            <p class="text-muted">Looks like you haven't added any items to your cart yet.</p>
+            <a href="/products" class="btn btn-terracotta mt-3">
+                <i class="fas fa-store me-2"></i> Start Shopping
+            </a>
         </div>
     {% endif %}
 </div>
 
 <script>
-    function updateQty(productId, qty) {
-        if (qty < 0) return;
+function updateQuantity(productId, quantity) {
+    if (quantity < 0) return;
+    fetch('/update-cart', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({product_id: productId, quantity: quantity})
+    }).then(() => location.reload());
+}
+
+function removeItem(productId) {
+    if (confirm('Remove this item from cart?')) {
+        fetch(`/remove-from-cart/${productId}`, {method: 'POST'})
+            .then(() => location.reload());
+    }
+}
+
+function clearCart() {
+    if (confirm('Clear your entire cart?')) {
+        const cart = {};
         fetch('/update-cart', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({product_id: productId, quantity: qty})
+            body: JSON.stringify({product_id: 'all', quantity: 0})
         }).then(() => location.reload());
     }
-    
-    function removeItem(productId) {
-        fetch('/remove-from-cart/' + productId, {method: 'POST'})
-            .then(() => location.reload());
-    }
+}
+
+function removeCoupon() {
+    fetch('/remove-coupon', {method: 'POST'})
+        .then(() => location.reload());
+}
 </script>
-{% endblock %}  
+{% endblock %}

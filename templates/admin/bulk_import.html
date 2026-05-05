@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Bulk Import Products{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="card">
+        <div class="card-header">
+            <h4>Bulk Import Products</h4>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="/admin/products/import" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label class="form-label">CSV File</label>
+                    <input type="file" name="csv_file" class="form-control" accept=".csv" required>
+                </div>
+                <button type="submit" class="btn btn-terracotta">Upload & Import</button>
+                <a href="/admin/products" class="btn btn-secondary">Cancel</a>
+            </form>
+            
+            <hr>
+            
+            <h6>CSV Format Example:</h6>
+            <pre class="bg-light p-2">name,sku,price,stock,description
+Chef Knife,KN001,89999,50,High-quality knife
+Frying Pan,PN001,49999,100,Non-stick pan</pre>
+        </div>
+    </div>
+</div>
+{% endblock %}

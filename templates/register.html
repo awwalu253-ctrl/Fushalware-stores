@@ -1,32 +1,84 @@
-<!-- register.html -->
 {% extends "base.html" %}
+
+{% block title %}Register - Golden Kitchen Nigeria{% endblock %}
 
 {% block content %}
 <div class="container my-5">
     <div class="row justify-content-center">
         <div class="col-md-5">
-            <div class="card">
-                <div class="card-body">
-                    <h3 class="text-center mb-4">Create Account</h3>
+            <div class="card border-0 shadow-lg">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-user-plus fa-3x" style="color: #E67E22;"></i>
+                        <h3 class="mt-2">Create Account</h3>
+                        <p class="text-muted">Join Golden Kitchen Nigeria</p>
+                    </div>
+                    
                     <form method="POST">
                         <div class="mb-3">
                             <label class="form-label">Full Name</label>
-                            <input type="text" name="name" class="form-control" required>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                <input type="text" name="name" class="form-control" required>
+                            </div>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Email</label>
-                            <input type="email" name="email" class="form-control" required>
+                            <label class="form-label">Email Address</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                <input type="email" name="email" class="form-control" required>
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Password</label>
-                            <input type="password" name="password" class="form-control" required>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                <input type="password" name="password" class="form-control" id="password" required>
+                            </div>
+                            <div class="progress mt-2" style="height: 5px;">
+                                <div id="passwordStrength" class="progress-bar" style="width: 0%;"></div>
+                            </div>
+                            <small class="text-muted" id="strengthText">Password strength</small>
                         </div>
-                        <button type="submit" class="btn btn-terracotta w-100">Register</button>
+                        <button type="submit" class="btn btn-terracotta w-100 py-2">
+                            <i class="fas fa-user-plus me-2"></i> Create Account
+                        </button>
                     </form>
-                    <p class="text-center mt-3">Already have an account? <a href="/login">Login</a></p>
+                    
+                    <hr class="my-4">
+                    
+                    <p class="text-center mb-0">
+                        Already have an account? <a href="/login" class="fw-bold" style="color: #E67E22;">Login</a>
+                    </p>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+document.getElementById('password').addEventListener('input', function() {
+    const password = this.value;
+    let strength = 0;
+    if (password.length >= 6) strength += 20;
+    if (password.match(/[A-Z]/)) strength += 20;
+    if (password.match(/[0-9]/)) strength += 20;
+    if (password.match(/[^A-Za-z0-9]/)) strength += 20;
+    if (password.length >= 10) strength += 20;
+    
+    document.getElementById('passwordStrength').style.width = strength + '%';
+    const strengthText = document.getElementById('strengthText');
+    
+    if (strength < 40) {
+        document.getElementById('passwordStrength').className = 'progress-bar bg-danger';
+        strengthText.innerHTML = 'Weak password';
+    } else if (strength < 70) {
+        document.getElementById('passwordStrength').className = 'progress-bar bg-warning';
+        strengthText.innerHTML = 'Medium password';
+    } else {
+        document.getElementById('passwordStrength').className = 'progress-bar bg-success';
+        strengthText.innerHTML = 'Strong password';
+    }
+});
+</script>
 {% endblock %}

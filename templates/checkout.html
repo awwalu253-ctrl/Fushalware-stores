@@ -4,58 +4,89 @@
 
 {% block content %}
 <div class="container my-5">
+    <h1 class="mb-4">Checkout</h1>
+    
     <div class="row">
-        <div class="col-md-7">
-            <div class="card">
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm">
                 <div class="card-body">
-                    <h4 class="card-title">Shipping Information</h4>
+                    <h5 class="card-title">Shipping Information</h5>
                     <form method="POST" action="/place-order">
-                        <div class="mb-3">
-                            <label class="form-label">Full Name *</label>
-                            <input type="text" name="name" class="form-control" required>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Full Name *</label>
+                                <input type="text" name="name" class="form-control" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Email *</label>
+                                <input type="email" name="email" class="form-control" required value="{{ session.user if session.user else '' }}">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Phone Number *</label>
+                                <input type="tel" name="phone" class="form-control" required placeholder="0803 123 4567">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">City/Town *</label>
+                                <input type="text" name="city" class="form-control" required>
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label">Delivery Address *</label>
+                                <textarea name="address" class="form-control" rows="3" required placeholder="Street address, house number, landmark"></textarea>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">State *</label>
+                                <select name="state" class="form-select" required>
+                                    <option value="">Select State</option>
+                                    <option>Lagos</option><option>Abuja FCT</option><option>Rivers</option>
+                                    <option>Ogun</option><option>Oyo</option><option>Kano</option>
+                                    <option>Kaduna</option><option>Delta</option><option>Edo</option>
+                                    <option>Enugu</option><option>Others</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Payment Method *</label>
+                                <select name="payment" class="form-select" required>
+                                    <option>Cash on Delivery</option>
+                                    <option>Bank Transfer</option>
+                                    <option>Card Payment</option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Email *</label>
-                            <input type="email" name="email" class="form-control" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Phone Number *</label>
-                            <input type="tel" name="phone" class="form-control" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Delivery Address *</label>
-                            <textarea name="address" class="form-control" rows="3" required></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">State *</label>
-                            <select name="state" class="form-select" required>
-                                <option value="">Select State</option>
-                                <option>Lagos</option><option>Abuja FCT</option><option>Rivers</option>
-                                <option>Ogun</option><option>Oyo</option><option>Kano</option>
-                                <option>Others</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Payment Method *</label>
-                            <select name="payment" class="form-select" required>
-                                <option>Cash on Delivery</option>
-                                <option>Bank Transfer</option>
-                                <option>Card Payment</option>
-                            </select>
-                        </div>
+                        
                         <button type="submit" class="btn btn-terracotta w-100">Place Order</button>
                     </form>
                 </div>
             </div>
         </div>
-        <div class="col-md-5">
-            <div class="card">
+        
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm">
                 <div class="card-body">
-                    <h4>Order Summary</h4>
+                    <h5 class="card-title">Order Summary</h5>
                     <hr>
-                    <p>Your order will be processed after confirmation.</p>
-                    <div class="alert alert-info">
-                        <i class="fas fa-truck"></i> Free shipping on orders over ₦50,000
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Subtotal:</span>
+                        <span>₦{{ "{:,.0f}".format(subtotal) }}</span>
+                    </div>
+                    {% if discount > 0 %}
+                    <div class="d-flex justify-content-between mb-2 text-success">
+                        <span>Discount:</span>
+                        <span>-₦{{ "{:,.0f}".format(discount) }}</span>
+                    </div>
+                    {% endif %}
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Shipping:</span>
+                        <span>₦{{ "{:,.0f}".format(shipping) }}</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between mb-3">
+                        <strong>Total:</strong>
+                        <strong class="fs-4" style="color: #E67E22;">₦{{ "{:,.0f}".format(final_total) }}</strong>
+                    </div>
+                    
+                    <div class="alert alert-info small">
+                        <i class="fas fa-truck"></i> Free shipping on orders over ₦50,000<br>
+                        <i class="fas fa-undo-alt"></i> 7-day return policy
                     </div>
                 </div>
             </div>

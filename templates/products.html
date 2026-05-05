@@ -1,29 +1,109 @@
 {% extends "base.html" %}
 
-{% block title %}All Products - Golden Kitchen Nigeria{% endblock %}
+{% block title %}Shop - Golden Kitchen Nigeria{% endblock %}
 
 {% block content %}
 <div class="container my-5">
-    <h1 class="text-center mb-4">All Products</h1>
-    
     <div class="row">
-        {% for product in products %}
-        <div class="col-md-3">
-            <div class="product-card">
-                <div class="product-image">
-                    <i class="fas fa-{{ product.image }} fa-3x"></i>
+        <!-- Sidebar Filters -->
+        <div class="col-lg-3 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5>Categories</h5>
+                    <div class="list-group list-group-flush">
+                        <a href="/products" class="list-group-item list-group-item-action {% if not current_category %}active{% endif %}" style="border: none;">
+                            All Products
+                        </a>
+                        {% for cat in categories %}
+                        <a href="/products?category={{ cat.name }}" class="list-group-item list-group-item-action {% if current_category == cat.name %}active{% endif %}" style="border: none;">
+                            {{ cat.name }} <span class="badge bg-secondary float-end">{{ cat.count }}</span>
+                        </a>
+                        {% endfor %}
+                    </div>
                 </div>
-                <div class="p-3">
-                    <h5>{{ product.name }}</h5>
-                    <p class="text-muted">{{ product.description[:50] }}</p>
-                    <p class="fw-bold text-terracotta fs-4">₦{{ "{:,.0f}".format(product.price) }}</p>
-                    <button class="btn btn-terracotta w-100" onclick="addToCart({{ product.id }})">
-                        <i class="fas fa-shopping-cart"></i> Add to Cart
-                    </button>
+            </div>
+            
+            <div class="card border-0 shadow-sm mt-4">
+                <div class="card-body">
+                    <h5>Sort By</h5>
+                    <select class="form-select" id="sortSelect" onchange="applySort()">
+                        <option value="">Default</option>
+                        <option value="price_asc">Price: Low to High</option>
+                        <option value="price_desc">Price: High to Low</option>
+                        <option value="rating">Highest Rated</option>
+                        <option value="bestseller">Best Sellers</option>
+                    </select>
                 </div>
             </div>
         </div>
-        {% endfor %}
+        
+        <!-- Products Grid -->
+        <div class="col-lg-9">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3>All Products</h3>
+                <p class="text-muted mb-0">{{ products|length }} products found</p>
+            </div>
+            
+            <div class="row g-4">
+                {% for product in products %}
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm hover-card">
+                        <div class="card-body text-center">
+                            {% if product.bestseller %}
+                                <span class="badge bg-warning position-absolute top-0 start-0 m-2">Best Seller</span>
+                            {% endif %}
+                            {% if product.compare_price %}
+                                <span class="badge bg-danger position-absolute top-0 end-0 m-2">Sale</span>
+                            {% endif %}
+                            <div class="product-image my-3">
+                                <i class="fas fa-{{ product.image }} fa-4x" style="color: #E67E22;"></i>
+                            </div>
+                            <h5 class="card-title">{{ product.name }}</h5>
+                            <div class="mb-2">
+                                <i class="fas fa-star text-warning"></i>
+                                <span>{{ product.rating }}</span>
+                                <span class="text-muted">({{ product.reviews }} reviews)</span>
+                            </div>
+                            <div class="mb-2">
+                                {% if product.compare_price %}
+                                    <span class="text-muted text-decoration-line-through me-2">₦{{ "{:,.0f}".format(product.compare_price) }}</span>
+                                {% endif %}
+                                <span class="fw-bold fs-5" style="color: #E67E22;">₦{{ "{:,.0f}".format(product.price) }}</span>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-terracotta flex-grow-1" onclick="addToCart({{ product.id }})">
+                                    <i class="fas fa-shopping-cart"></i> Add
+                                </button>
+                                <button class="btn btn-outline-terracotta" onclick="addToWishlist({{ product.id }})">
+                                    <i class="fas fa-heart"></i>
+                                </button>
+                            </div>
+                            <a href="/product/{{ product.id }}" class="btn btn-link btn-sm mt-2">View Details</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
     </div>
 </div>
+
+<script>
+function applySort() {
+    const sort = document.getElementById('sortSelect').value;
+    const url = new URL(window.location.href);
+    if (sort) {
+        url.searchParams.set('sort', sort);
+    } else {
+        url.searchParams.delete('sort');
+    }
+    window.location.href = url.toString();
+}
+</script>
+
+<style>
+.hover-card { transition: all 0.3s; }
+.hover-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important; }
+.list-group-item.active { background: #E67E22; border-color: #E67E22; }
+</style>
 {% endblock %}

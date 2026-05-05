@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Reviews - Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <h1 class="mb-4">Manage Customer Reviews</h1>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Pending Reviews ({{ pending_reviews|length }})</h5>
+                </div>
+                <div class="card-body p-0">
+                    {% for review in pending_reviews %}
+                    <div class="border-bottom p-3">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <div class="mb-1">
+                                    {% for i in range(review.rating) %}★{% endfor %}
+                                    {% for i in range(5 - review.rating) %}☆{% endfor %}
+                                </div>
+                                <strong>{{ review.title }}</strong>
+                                <p class="mb-1">{{ review.comment }}</p>
+                                <small class="text-muted">By {{ review.user }} on {{ review.date }}</small>
+                                <small class="text-muted d-block">Product ID: {{ review.product_id }}</small>
+                            </div>
+                            <div>
+                                <button class="btn btn-sm btn-success" onclick="approveReview({{ review.id }})">
+                                    <i class="fas fa-check"></i> Approve
+                                </button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteReview({{ review.id }})">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Approved Reviews ({{ approved_reviews|length }})</h5>
+                </div>
+                <div class="card-body p-0">
+                    {% for review in approved_reviews %}
+                    <div class="border-bottom p-3">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <div class="mb-1">
+                                    {% for i in range(review.rating) %}★{% endfor %}
+                                    {% for i in range(5 - review.rating) %}☆{% endfor %}
+                                </div>
+                                <strong>{{ review.title }}</strong>
+                                <p class="mb-1">{{ review.comment }}</p>
+                                <small class="text-muted">By {{ review.user }} on {{ review.date }}</small>
+                            </div>
+                            <div>
+                                <button class="btn btn-sm btn-danger" onclick="deleteReview({{ review.id }})">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function approveReview(reviewId) {
+    fetch(`/admin/reviews/approve/${reviewId}`, {method: 'POST'})
+        .then(() => location.reload());
+}
+function deleteReview(reviewId) {
+    if(confirm('Delete this review?')) {
+        fetch(`/admin/reviews/delete/${reviewId}`, {method: 'POST'})
+            .then(() => location.reload());
+    }
+}
+</script>
+{% endblock %}

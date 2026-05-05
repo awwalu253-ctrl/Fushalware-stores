@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Customers - Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Manage Customers</h1>
+        <a href="/admin/export-customers" class="btn btn-outline-terracotta">
+            <i class="fas fa-download"></i> Export CSV
+        </a>
+    </div>
+    
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Joined</th>
+                            <th>Orders</th>
+                            <th>Total Spent</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for customer in customers %}
+                        <tr>
+                            <td>{{ customer.id }}</td>
+                            <td>{{ customer.name }}</td>
+                            <td>{{ customer.email }}</td>
+                            <td>{{ customer.created_at[:10] if customer.created_at else 'N/A' }}</td>
+                            <td>0</td>
+                            <td>₦0</td>
+                            <td><span class="badge bg-success">Active</span></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
