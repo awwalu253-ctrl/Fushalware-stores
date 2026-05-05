@@ -1,0 +1,455 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Edit Product - Admin{% endblock %}
+
+{% block page_title %}
+<i class="fas fa-edit me-2" style="color: var(--primary);"></i>Edit Product
+{% endblock %}
+
+{% block admin_content %}
+<div class="edit-product-page">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <!-- Card Header -->
+                <div class="card-header bg-white py-3 border-0" style="border-bottom: 1px solid var(--border);">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="product-icon-wrapper">
+                            <i class="fas fa-{{ product.image|default('box') }} fa-2x" style="color: var(--primary);"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-0">Editing: {{ product.name }}</h5>
+                            <small class="text-muted">Product ID: #{{ product.id }}</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Card Body -->
+                <div class="card-body p-4">
+                    <form method="POST" id="productForm">
+                        <div class="row g-3">
+                            <!-- Product Name -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">
+                                    <i class="fas fa-tag me-1" style="color: var(--primary);"></i>Product Name *
+                                </label>
+                                <input type="text" name="name" class="form-control form-control-lg" value="{{ product.name }}" required placeholder="e.g., Professional Chef Knife">
+                                <small class="text-muted">Enter the full product name as it will appear to customers</small>
+                            </div>
+                            
+                            <!-- Category -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">
+                                    <i class="fas fa-folder me-1" style="color: var(--primary);"></i>Category *
+                                </label>
+                                <select name="category" class="form-select form-select-lg" required>
+                                    <option value="">Select Category</option>
+                                    <option value="Knives" {% if product.category == 'Knives' %}selected{% endif %}>🔪 Knives</option>
+                                    <option value="Pans" {% if product.category == 'Pans' %}selected{% endif %}>🍳 Pans</option>
+                                    <option value="Pots" {% if product.category == 'Pots' %}selected{% endif %}>🍲 Pots</option>
+                                    <option value="Utensils" {% if product.category == 'Utensils' %}selected{% endif %}>🥄 Utensils</option>
+                                    <option value="Bakeware" {% if product.category == 'Bakeware' %}selected{% endif %}>🍰 Bakeware</option>
+                                    <option value="Kitchen Tools" {% if product.category == 'Kitchen Tools' %}selected{% endif %}>🔧 Kitchen Tools</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Price -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">
+                                    <i class="fas fa-naira-sign me-1" style="color: var(--primary);"></i>Price (₦) *
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text" style="background: var(--gray-light); border-right: none;">₦</span>
+                                    <input type="number" name="price" class="form-control" step="100" value="{{ product.price }}" required style="border-left: none;">
+                                </div>
+                            </div>
+                            
+                            <!-- Compare Price -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">
+                                    <i class="fas fa-tag me-1" style="color: var(--primary);"></i>Compare Price
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text" style="background: var(--gray-light); border-right: none;">₦</span>
+                                    <input type="number" name="compare_price" class="form-control" step="100" value="{{ product.compare_price or '' }}" style="border-left: none;">
+                                </div>
+                                <small class="text-muted">Original price for discount display</small>
+                            </div>
+                            
+                            <!-- Stock Quantity -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">
+                                    <i class="fas fa-boxes me-1" style="color: var(--primary);"></i>Stock Quantity *
+                                </label>
+                                <input type="number" name="stock" class="form-control" value="{{ product.stock }}" required>
+                                <small class="text-muted">Current inventory count</small>
+                            </div>
+                            
+                            <!-- Icon/Image -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">
+                                    <i class="fas fa-image me-1" style="color: var(--primary);"></i>Product Icon
+                                </label>
+                                <select name="image" class="form-select">
+                                    <option value="knife" {% if product.image == 'knife' %}selected{% endif %}>🔪 Knife</option>
+                                    <option value="pan" {% if product.image == 'pan' %}selected{% endif %}>🍳 Pan</option>
+                                    <option value="pot" {% if product.image == 'pot' %}selected{% endif %}>🍲 Pot</option>
+                                    <option value="utensil" {% if product.image == 'utensil' %}selected{% endif %}>🥄 Utensil</option>
+                                    <option value="cup" {% if product.image == 'cup' %}selected{% endif %}>☕ Cup/Mug</option>
+                                    <option value="cutting-board" {% if product.image == 'cutting-board' %}selected{% endif %}>🔪 Cutting Board</option>
+                                    <option value="blender" {% if product.image == 'blender' %}selected{% endif %}>🥤 Blender</option>
+                                    <option value="fork" {% if product.image == 'fork' %}selected{% endif %}>🍴 Fork/Spoon</option>
+                                </select>
+                                <small class="text-muted">Choose an icon that best represents the product</small>
+                            </div>
+                            
+                            <!-- SKU (Optional) -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">
+                                    <i class="fas fa-barcode me-1" style="color: var(--primary);"></i>SKU (Stock Keeping Unit)
+                                </label>
+                                <input type="text" name="sku" class="form-control" value="{{ product.sku|default('') }}" placeholder="e.g., GK-PROD-001">
+                                <small class="text-muted">Optional internal product code</small>
+                            </div>
+                            
+                            <!-- Description -->
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">
+                                    <i class="fas fa-align-left me-1" style="color: var(--primary);"></i>Product Description *
+                                </label>
+                                <textarea name="description" class="form-control" rows="5" required placeholder="Describe the product features, benefits, and specifications...">{{ product.description }}</textarea>
+                                <small class="text-muted">Detailed description that will appear on the product page</small>
+                            </div>
+                            
+                            <!-- Short Description -->
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">
+                                    <i class="fas fa-info-circle me-1" style="color: var(--primary);"></i>Short Description
+                                </label>
+                                <textarea name="short_description" class="form-control" rows="2" placeholder="Brief summary for product cards (max 100 characters)">{{ product.short_description|default('') }}</textarea>
+                                <small class="text-muted">Brief description shown on product cards</small>
+                            </div>
+                            
+                            <!-- Status Toggles -->
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Product Status</label>
+                                <div class="d-flex gap-4 flex-wrap">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="featured" id="featured" {% if product.featured %}checked{% endif %} style="background-color: {% if product.featured %}var(--primary){% endif %}; border-color: var(--primary);">
+                                        <label class="form-check-label" for="featured">
+                                            <i class="fas fa-star me-1" style="color: #f59e0b;"></i>Featured Product
+                                        </label>
+                                    </div>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="bestseller" id="bestseller" {% if product.bestseller %}checked{% endif %} style="background-color: {% if product.bestseller %}var(--primary){% endif %}; border-color: var(--primary);">
+                                        <label class="form-check-label" for="bestseller">
+                                            <i class="fas fa-fire me-1" style="color: #ef4444;"></i>Best Seller
+                                        </label>
+                                    </div>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="active" id="active" {% if product.active|default(true) %}checked{% endif %}>
+                                        <label class="form-check-label" for="active">
+                                            <i class="fas fa-check-circle me-1" style="color: #2D6A4F;"></i>Active (Visible in store)
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Weight & Dimensions (Optional) -->
+                            <div class="col-12 mt-3">
+                                <hr>
+                                <h6 class="mb-3"><i class="fas fa-weight-hanging me-2" style="color: var(--primary);"></i>Shipping Details (Optional)</h6>
+                                <div class="row g-3">
+                                    <div class="col-md-3">
+                                        <label class="form-label small">Weight (kg)</label>
+                                        <input type="number" name="weight" class="form-control" step="0.1" value="{{ product.weight|default('') }}" placeholder="0.5">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label small">Length (cm)</label>
+                                        <input type="number" name="length" class="form-control" step="0.1" value="{{ product.length|default('') }}" placeholder="30">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label small">Width (cm)</label>
+                                        <input type="number" name="width" class="form-control" step="0.1" value="{{ product.width|default('') }}" placeholder="20">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label small">Height (cm)</label>
+                                        <input type="number" name="height" class="form-control" step="0.1" value="{{ product.height|default('') }}" placeholder="10">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <hr class="my-4">
+                        
+                        <!-- Form Actions -->
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                            <div>
+                                <a href="/admin/products" class="btn btn-admin-outline">
+                                    <i class="fas fa-arrow-left me-1"></i> Cancel
+                                </a>
+                                <button type="button" class="btn btn-admin-outline" onclick="previewProduct()">
+                                    <i class="fas fa-eye me-1"></i> Preview
+                                </button>
+                            </div>
+                            <div>
+                                <button type="submit" class="btn btn-admin-primary" id="submitBtn">
+                                    <i class="fas fa-save me-1"></i> Update Product
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Danger Zone -->
+            <div class="card border-0 shadow-sm rounded-4 mt-4 overflow-hidden">
+                <div class="card-header bg-white py-3 border-0" style="border-bottom: 1px solid #fee2e2;">
+                    <h6 class="mb-0 text-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Danger Zone
+                    </h6>
+                </div>
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                        <div>
+                            <strong>Delete this product</strong>
+                            <p class="text-muted small mb-0">Once deleted, this product cannot be recovered.</p>
+                        </div>
+                        <form method="POST" action="/admin/products/delete/{{ product.id }}" 
+                              onsubmit="return confirm('⚠️ WARNING: This will permanently delete "{{ product.name }}". This action cannot be undone. Are you sure?')">
+                            <button class="btn btn-danger" style="background: #dc2626; border: none;">
+                                <i class="fas fa-trash-alt me-1"></i> Delete Product
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Preview Modal -->
+<div class="modal fade" id="previewModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content rounded-4">
+            <div class="modal-header border-0">
+                <h5 class="modal-title">Product Preview</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="previewContent"></div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-admin-outline" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.edit-product-page {
+    animation: fadeIn 0.3s ease;
+}
+
+/* Form Styling */
+.form-control, .form-select {
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    padding: 10px 14px;
+    transition: all 0.2s;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(198, 164, 63, 0.1);
+}
+
+.form-control-lg {
+    font-size: 1rem;
+    padding: 12px 16px;
+}
+
+.form-check-input:checked {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+.form-check-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(198, 164, 63, 0.2);
+}
+
+/* Input Group */
+.input-group-text {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    color: var(--primary);
+}
+
+/* Product Icon Wrapper */
+.product-icon-wrapper {
+    width: 60px;
+    height: 60px;
+    background: rgba(198, 164, 63, 0.1);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Danger Zone */
+.btn-danger {
+    background: #dc2626;
+    border: none;
+    border-radius: 10px;
+    padding: 8px 20px;
+    transition: all 0.2s;
+}
+
+.btn-danger:hover {
+    background: #b91c1c;
+    transform: translateY(-1px);
+}
+
+/* Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .card-body {
+        padding: 20px;
+    }
+    
+    .product-icon-wrapper {
+        width: 45px;
+        height: 45px;
+    }
+    
+    .product-icon-wrapper i {
+        font-size: 1.2rem;
+    }
+    
+    .form-control, .form-select {
+        font-size: 0.9rem;
+        padding: 8px 12px;
+    }
+    
+    .d-flex.justify-content-between {
+        flex-direction: column;
+        gap: 12px;
+    }
+}
+</style>
+
+<script>
+// Live preview function
+function previewProduct() {
+    // Get form values
+    const name = document.querySelector('input[name="name"]').value;
+    const price = document.querySelector('input[name="price"]').value;
+    const comparePrice = document.querySelector('input[name="compare_price"]').value;
+    const description = document.querySelector('textarea[name="description"]').value;
+    const category = document.querySelector('select[name="category"]').value;
+    const stock = document.querySelector('input[name="stock"]').value;
+    const image = document.querySelector('select[name="image"]').value;
+    const featured = document.querySelector('input[name="featured"]').checked;
+    const bestseller = document.querySelector('input[name="bestseller"]').checked;
+    
+    let imageIcon = '';
+    switch(image) {
+        case 'knife': imageIcon = 'fa-kitchen-set'; break;
+        case 'pan': imageIcon = 'fa-frying-pan'; break;
+        case 'pot': imageIcon = 'fa-mug-hot'; break;
+        case 'utensil': imageIcon = 'fa-utensils'; break;
+        case 'cup': imageIcon = 'fa-mug-saucer'; break;
+        default: imageIcon = 'fa-box';
+    }
+    
+    const previewHtml = `
+        <div class="card rounded-4 overflow-hidden" style="max-width: 400px; margin: 0 auto;">
+            <div class="product-image" style="height: 200px; background: linear-gradient(135deg, #FFF9F0, #FFF5E6); display: flex; align-items: center; justify-content: center;">
+                <i class="fas ${imageIcon} fa-5x" style="color: var(--primary);"></i>
+            </div>
+            <div class="p-4">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h5 class="mb-0">${name}</h5>
+                    ${bestseller ? '<span class="badge bg-warning">🔥 Best Seller</span>' : ''}
+                </div>
+                <p class="text-muted small">${category}</p>
+                <div class="mb-2">
+                    ${comparePrice ? `<span class="text-muted text-decoration-line-through me-2">₦${parseInt(comparePrice).toLocaleString()}</span>` : ''}
+                    <span class="fw-bold fs-4" style="color: var(--primary);">₦${parseInt(price).toLocaleString()}</span>
+                </div>
+                <p class="small text-muted">${description.substring(0, 100)}${description.length > 100 ? '...' : ''}</p>
+                <div class="mb-2">
+                    <span class="badge ${stock > 0 ? 'bg-success' : 'bg-danger'}">${stock > 0 ? stock + ' in stock' : 'Out of Stock'}</span>
+                    ${featured ? '<span class="badge bg-info ms-1">Featured</span>' : ''}
+                </div>
+                <button class="btn btn-primary-custom w-100" disabled>Add to Cart</button>
+            </div>
+        </div>
+    `;
+    
+    const previewModal = new bootstrap.Modal(document.getElementById('previewModal'));
+    document.getElementById('previewContent').innerHTML = previewHtml;
+    previewModal.show();
+}
+
+// Form validation before submit
+document.getElementById('productForm').addEventListener('submit', function(e) {
+    const name = document.querySelector('input[name="name"]').value;
+    const price = document.querySelector('input[name="price"]').value;
+    const stock = document.querySelector('input[name="stock"]').value;
+    const description = document.querySelector('textarea[name="description"]').value;
+    
+    if (!name.trim()) {
+        e.preventDefault();
+        showFlash('Product name is required', 'danger');
+        return;
+    }
+    
+    if (!price || price <= 0) {
+        e.preventDefault();
+        showFlash('Please enter a valid price', 'danger');
+        return;
+    }
+    
+    if (!stock || stock < 0) {
+        e.preventDefault();
+        showFlash('Please enter a valid stock quantity', 'danger');
+        return;
+    }
+    
+    if (!description.trim()) {
+        e.preventDefault();
+        showFlash('Product description is required', 'danger');
+        return;
+    }
+    
+    // Show loading state
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Updating...';
+});
+
+// Auto-format price fields
+const priceInputs = document.querySelectorAll('input[type="number"]');
+priceInputs.forEach(input => {
+    input.addEventListener('blur', function() {
+        if (this.value && this.step === '100') {
+            const value = Math.round(this.value / 100) * 100;
+            this.value = value;
+        }
+    });
+});
+</script>
+{% endblock %}

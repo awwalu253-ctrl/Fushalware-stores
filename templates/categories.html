@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Categories - Golden Kitchen Nigeria{% endblock %}
+
+{% block content %}
+<!-- Categories Hero -->
+<section style="background: linear-gradient(135deg, var(--gray-light) 0%, white 100%); padding: 60px 0 40px;">
+    <div class="container text-center">
+        <h1 class="display-4 fw-bold" style="font-family: 'Cormorant Garamond', serif;">
+            <i class="fas fa-tags me-3" style="color: var(--primary);"></i>Shop by Category
+        </h1>
+        <p class="lead text-muted">Browse our premium cookware collections</p>
+    </div>
+</section>
+
+<div class="container my-5">
+    <div class="row g-4">
+        {% for cat in categories %}
+        <div class="col-md-4 col-lg-3" data-aos="fade-up" data-aos-delay="{{ loop.index * 50 }}">
+            <a href="/products?category={{ cat.name }}" class="text-decoration-none">
+                <div class="category-card text-center" style="background: white; border-radius: 20px; padding: 2rem 1rem; transition: all 0.3s ease; border: 1px solid var(--border); height: 100%;">
+                    <div style="width: 80px; height: 80px; background: rgba(198, 164, 63, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                        <i class="fas fa-{{ cat.icon }} fa-3x" style="color: var(--primary);"></i>
+                    </div>
+                    <h5 class="mb-2" style="color: var(--dark); font-weight: 600;">{{ cat.name }}</h5>
+                    <div class="d-flex justify-content-center gap-3 mt-2">
+                        <span class="badge" style="background: var(--primary-light); color: white; padding: 5px 12px; border-radius: 20px;">
+                            <i class="fas fa-box me-1"></i>{{ cat.count }} Products
+                        </span>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Featured Banner -->
+    <div class="row mt-5" data-aos="fade-up">
+        <div class="col-12">
+            <div style="position: relative; border-radius: 24px; overflow: hidden;">
+                <video autoplay muted loop playsinline style="width: 100%; height: 200px; object-fit: cover;">
+                    <source src="https://cdn.pixabay.com/video/2019/09/19/25716-361896455_large.mp4" type="video/mp4">
+                </video>
+                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(0,0,0,0.6), rgba(0,0,0,0.4)); display: flex; align-items: center; justify-content: center; text-align: center; color: white;">
+                                    <div>
+                                        <i class="fas fa-gem fa-3x mb-2" style="color: var(--primary);"></i>
+                                        <h3 style="color: white;">Not sure what you need?</h3>
+                                        <p>Let our AI assistant help you find the perfect cookware</p>
+                                        <button class="btn btn-primary-custom" onclick="document.getElementById('chatButton').click()">
+                                            <i class="fas fa-robot me-2"></i>Ask AI Assistant
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+<style>
+    .category-card:hover {
+        transform: translateY(-8px);
+        border-color: var(--primary);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .category-card {
+        animation: fadeInUp 0.5s ease backwards;
+    }
+</style>
+{% endblock %}

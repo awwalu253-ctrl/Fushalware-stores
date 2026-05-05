@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+
+{% block title %}Search Results - {{ query }}{% endblock %}
+
+{% block content %}
+<!-- Search Hero -->
+<section style="background: linear-gradient(135deg, var(--gray-light) 0%, white 100%); padding: 60px 0 40px;">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="display-5 fw-bold" style="font-family: 'Cormorant Garamond', serif;">
+                    <i class="fas fa-search me-3" style="color: var(--primary);"></i>Search Results
+                </h1>
+                <p class="lead text-muted">Showing results for "<strong>{{ query }}</strong>"</p>
+            </div>
+            <div class="col-lg-4">
+                <form action="/search" method="GET" class="d-flex">
+                    <div class="input-group">
+                        <input type="text" name="q" class="form-control" placeholder="Search again..." value="{{ query }}">
+                        <button class="btn btn-primary-custom" type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container my-5">
+    {% if products %}
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <p class="text-muted mb-0">
+                <i class="fas fa-box me-1"></i>{{ products|length }} product(s) found
+            </p>
+            <div class="dropdown">
+                <button class="btn btn-outline-custom btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+                    <i class="fas fa-sort me-1"></i>Sort By
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#" onclick="sortResults('relevance')">Relevance</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="sortResults('price_asc')">Price: Low to High</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="sortResults('price_desc')">Price: High to Low</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="row g-4" id="resultsContainer">
+            {% for product in products %}
+            <div class="col-md-4 col-lg-3 product-item" data-price="{{ product.price }}" data-aos="fade-up" data-aos-delay="{{ loop.index * 50 }}">
+                <div class="product-card">
+                    <div class="product-image" style="height: 180px; background: linear-gradient(135deg, #FFF9F0, #FFF5E6); display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-{{ product.image }} fa-4x" style="color: var(--primary);"></i>
+                    </div>
+                    <div class="p-3">
+                        <h5 class="card-title" style="font-weight: 600; font-size: 1rem;">{{ product.name }}</h5>
+                        <p class="text-muted small">{{ product.category }}</p>
+                        <div class="mb-2">
+                            <span class="fw-bold fs-5" style="color: var(--primary);">₦{{ "{:,.0f}".format(product.price) }}</span>
+                            {% if product.compare_price %}
+                                <span class="text-muted text-decoration-line-through ms-2" style="font-size: 0.8rem;">₦{{ "{:,.0f}".format(product.compare_price) }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-primary-custom flex-grow-1" onclick="addToCart({{ product.id }})" style="padding: 0.5rem;">
+                                <i class="fas fa-shopping-cart me-1"></i> Add
+                            </button>
+                            <button class="btn btn-outline-custom" onclick="addToWishlist({{ product.id }})" style="padding: 0.5rem 0.8rem;">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                        <a href="/product/{{ product.id }}" class="btn btn-link btn-sm w-100 mt-2" style="font-size: 0.75rem;">View Details →</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Pagination -->
+        {% if products|length > 12 %}
+        <div class="d-flex justify-content-center mt-5">
+            <nav>
+                <ul class="pagination">
+                    <li class="page-item disabled"><a class="page-link" href="#"><i class="fas fa-chevron-left"></i></a></li>
+                    <li class="page-item active"><a class="page-link" href="#" style="background: var(--primary); border-color: var(--primary);">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item"><a class="page-link" href="#"><i class="fas fa-chevron-right"></i></a></li>
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+        
+    {% else %}
+        <!-- No Results State -->
+        <div class="text-center py-5" data-aos="fade-up">
+            <div style="width: 150px; height: 150px; background: var(--gray-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 2rem;">
+                <i class="fas fa-search fa-4x" style="color: var(--gray);"></i>
+            </div>
+            <h3 style="font-family: 'Cormorant Garamond', serif;">No products found</h3>
+            <p class="text-muted mb-4">We couldn't find any products matching "{{ query }}"</p>
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm rounded-4">
+                        <div class="card-body">
+                            <h6 class="mb-3">Try these suggestions:</h6>
+                            <ul class="text-muted">
+                                <li>Check your spelling</li>
+                                <li>Try a different keyword</li>
+                                <li>Browse our categories instead</li>
+                            </ul>
+                            <div class="d-flex gap-2 justify-content-center mt-3">
+                                <a href="/products" class="btn btn-primary-custom">
+                                    <i class="fas fa-store me-2"></i>Browse All Products
+                                </a>
+                                <button class="btn btn-outline-custom" onclick="document.getElementById('chatButton').click()">
+                                    <i class="fas fa-robot me-2"></i>Ask AI Assistant
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Featured Products Section -->
+        <div class="mt-5">
+            <h4 class="text-center mb-4">You might be interested in</h4>
+            <div class="row g-4">
+                <div class="col-md-3 col-6">
+                    <div class="product-card text-center p-3">
+                        <i class="fas fa-knife fa-3x" style="color: var(--primary);"></i>
+                        <h6 class="mt-2">Chef's Knife</h6>
+                        <span class="fw-bold" style="color: var(--primary);">₦12,500</span>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="product-card text-center p-3">
+                        <i class="fas fa-frying-pan fa-3x" style="color: var(--primary);"></i>
+                        <h6 class="mt-2">Frying Pan</h6>
+                        <span class="fw-bold" style="color: var(--primary);">₦18,000</span>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="product-card text-center p-3">
+                        <i class="fas fa-utensils fa-3x" style="color: var(--primary);"></i>
+                        <h6 class="mt-2">Utensil Set</h6>
+                        <span class="fw-bold" style="color: var(--primary);">₦8,500</span>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="product-card text-center p-3">
+                        <i class="fas fa-blender fa-3x" style="color: var(--primary);"></i>
+                        <h6 class="mt-2">Blender</h6>
+                        <span class="fw-bold" style="color: var(--primary);">₦35,000</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+    .product-card {
+        transition: all 0.3s ease;
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+        background: white;
+    }
+    
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        border-color: var(--primary);
+    }
+    
+    .page-link {
+        border-radius: 8px;
+        margin: 0 3px;
+        color: var(--dark);
+    }
+    
+    .page-link:hover {
+        color: var(--primary);
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .product-item {
+        animation: fadeIn 0.4s ease backwards;
+    }
+</style>
+
+<script>
+function sortResults(type) {
+    const container = document.getElementById('resultsContainer');
+    const items = Array.from(document.querySelectorAll('.product-item'));
+    
+    if (type === 'price_asc') {
+        items.sort((a, b) => parseFloat(a.dataset.price) - parseFloat(b.dataset.price));
+    } else if (type === 'price_desc') {
+        items.sort((a, b) => parseFloat(b.dataset.price) - parseFloat(a.dataset.price));
+    } else {
+        items.sort((a, b) => 0); // Keep original order
+    }
+    
+    items.forEach(item => container.appendChild(item));
+    showFlash('Products sorted!', 'success');
+}
+</script>
+{% endblock %}

@@ -3,140 +3,589 @@
 {% block title %}{{ product.name }} - Golden Kitchen Nigeria{% endblock %}
 
 {% block content %}
+<!-- Product Hero Section -->
+<section style="background: linear-gradient(135deg, var(--gray-light) 0%, white 100%); padding: 40px 0 60px;">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/" style="color: var(--dark); text-decoration: none;">Home</a></li>
+                <li class="breadcrumb-item"><a href="/products" style="color: var(--dark); text-decoration: none;">Shop</a></li>
+                <li class="breadcrumb-item"><a href="/products?category={{ product.category }}" style="color: var(--dark); text-decoration: none;">{{ product.category }}</a></li>
+                <li class="breadcrumb-item active" style="color: var(--primary);">{{ product.name }}</li>
+            </ol>
+        </nav>
+    </div>
+</section>
+
 <div class="container my-5">
     <div class="row">
-        <div class="col-md-6">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body text-center p-5">
-                    <i class="fas fa-{{ product.image }} fa-8x" style="color: #E67E22;"></i>
+        <!-- Product Image Gallery Section -->
+        <div class="col-md-6" data-aos="fade-right">
+            <div class="product-gallery">
+                <!-- Main Image Card -->
+                <div class="card border-0 shadow-lg rounded-4 overflow-hidden mb-3">
+                    <div class="card-body text-center p-5 position-relative" style="background: linear-gradient(135deg, #FFF9F0, #FFF5E6); min-height: 450px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-{{ product.image }} fa-8x" style="color: var(--primary); transition: transform 0.3s;" id="mainProductImage"></i>
+                        <!-- Quick Zoom Button -->
+                        <button class="btn btn-sm zoom-btn" onclick="zoomImage()" style="position: absolute; bottom: 20px; right: 20px; background: white; border-radius: 50%; width: 40px; height: 40px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                            <i class="fas fa-search-plus" style="color: var(--primary);"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Thumbnail Gallery -->
+                <div class="d-flex gap-2 justify-content-center">
+                    <div class="thumbnail active" style="width: 80px; height: 80px; background: var(--gray-light); border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px solid var(--primary);">
+                        <i class="fas fa-{{ product.image }} fa-2x" style="color: var(--primary);"></i>
+                    </div>
+                    <div class="thumbnail" style="width: 80px; height: 80px; background: var(--gray-light); border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px solid transparent;">
+                        <i class="fas fa-utensils fa-2x" style="color: var(--gray);"></i>
+                    </div>
+                    <div class="thumbnail" style="width: 80px; height: 80px; background: var(--gray-light); border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px solid transparent;">
+                        <i class="fas fa-kitchen-set fa-2x" style="color: var(--gray);"></i>
+                    </div>
+                    <div class="thumbnail" style="width: 80px; height: 80px; background: var(--gray-light); border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px solid transparent;">
+                        <i class="fas fa-blender fa-2x" style="color: var(--gray);"></i>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-6">
-            <h1>{{ product.name }}</h1>
-            <div class="mb-2">
-                <i class="fas fa-star text-warning"></i>
-                <span>{{ product.rating }}</span>
-                <span class="text-muted">({{ product.reviews }} reviews)</span>
-            </div>
-            <div class="mb-3">
-                {% if product.compare_price %}
-                    <span class="text-muted text-decoration-line-through fs-5 me-2">₦{{ "{:,.0f}".format(product.compare_price) }}</span>
-                {% endif %}
-                <span class="fw-bold fs-1" style="color: #E67E22;">₦{{ "{:,.0f}".format(product.price) }}</span>
-            </div>
-            <p class="lead">{{ product.description }}</p>
-            
+        
+        <!-- Product Info Section -->
+        <div class="col-md-6" data-aos="fade-left">
+            <!-- Stock Status Badge -->
             <div class="mb-3">
                 {% if product.stock > 0 %}
-                    <span class="badge bg-success">In Stock ({{ product.stock }} available)</span>
+                    <span class="badge" style="background: #2D6A4F; padding: 8px 16px; border-radius: 30px;">
+                        <i class="fas fa-check-circle me-1"></i> In Stock ({{ product.stock }} available)
+                    </span>
                 {% else %}
-                    <span class="badge bg-danger">Out of Stock</span>
+                    <span class="badge" style="background: #C0392B; padding: 8px 16px; border-radius: 30px;">
+                        <i class="fas fa-times-circle me-1"></i> Out of Stock
+                    </span>
                 {% endif %}
             </div>
             
-            <div class="d-flex gap-3 mb-4">
-                <div class="quantity-selector d-flex align-items-center">
-                    <button class="btn btn-sm btn-outline-secondary" onclick="decrementQty()">-</button>
-                    <input type="number" id="quantity" value="1" min="1" max="{{ product.stock }}" class="form-control text-center" style="width: 60px;">
-                    <button class="btn btn-sm btn-outline-secondary" onclick="incrementQty()">+</button>
+            <h1 style="font-family: 'Cormorant Garamond', serif; font-size: 2.5rem; font-weight: 700; color: var(--dark);">{{ product.name }}</h1>
+            
+            <!-- Rating Section -->
+            <div class="mb-3 d-flex align-items-center gap-3">
+                <div>
+                    {% set rating = product.rating|default(4.5)|float %}
+                    {% set full_stars = rating|round(0, 'floor')|int %}
+                    {% set half_star = (rating - full_stars) >= 0.25 %}
+                    {% for i in range(5) %}
+                        {% if i < full_stars %}
+                            <i class="fas fa-star" style="color: #FFD700;"></i>
+                        {% elif half_star and i == full_stars %}
+                            <i class="fas fa-star-half-alt" style="color: #FFD700;"></i>
+                        {% else %}
+                            <i class="far fa-star" style="color: #FFD700;"></i>
+                        {% endif %}
+                    {% endfor %}
                 </div>
-                <button class="btn btn-terracotta flex-grow-1" onclick="addToCartWithQty({{ product.id }})" {% if product.stock == 0 %}disabled{% endif %}>
-                    <i class="fas fa-shopping-cart"></i> Add to Cart
-                </button>
-                <button class="btn btn-outline-terracotta" onclick="addToWishlist({{ product.id }})">
-                    <i class="fas fa-heart"></i>
+                <span style="color: var(--dark); font-weight: 500;">{{ product.rating|default(4.5) }}</span>
+                <span class="text-muted">({{ product.reviews|default(128) }} verified reviews)</span>
+            </div>
+            
+            <!-- Price Section -->
+            <div class="mb-4">
+                {% if product.compare_price %}
+                    <span class="text-muted text-decoration-line-through fs-4 me-3">₦{{ "{:,.0f}".format(product.compare_price) }}</span>
+                {% endif %}
+                <span class="fw-bold display-5" style="color: var(--primary);">₦{{ "{:,.0f}".format(product.price) }}</span>
+                {% if product.compare_price %}
+                    <span class="badge ms-2" style="background: var(--primary); padding: 5px 12px;">Save ₦{{ "{:,.0f}".format(product.compare_price - product.price) }}</span>
+                {% endif %}
+            </div>
+            
+            <!-- Short Description -->
+            <p class="lead" style="color: var(--gray); line-height: 1.8;">{{ product.description }}</p>
+            
+            <!-- Key Features List -->
+            <div class="mb-4">
+                <h6 style="font-weight: 700; margin-bottom: 12px;"><i class="fas fa-check-circle me-2" style="color: var(--primary);"></i>Key Features</h6>
+                <div class="row">
+                    <div class="col-6">
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><i class="fas fa-check me-2" style="color: var(--primary); font-size: 12px;"></i> Premium Quality Material</li>
+                            <li class="mb-2"><i class="fas fa-check me-2" style="color: var(--primary); font-size: 12px;"></i> Non-Stick Coating</li>
+                            <li class="mb-2"><i class="fas fa-check me-2" style="color: var(--primary); font-size: 12px;"></i> Heat Resistant Handle</li>
+                        </ul>
+                    </div>
+                    <div class="col-6">
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><i class="fas fa-check me-2" style="color: var(--primary); font-size: 12px;"></i> Dishwasher Safe</li>
+                            <li class="mb-2"><i class="fas fa-check me-2" style="color: var(--primary); font-size: 12px;"></i> 5-Year Warranty</li>
+                            <li class="mb-2"><i class="fas fa-check me-2" style="color: var(--primary); font-size: 12px;"></i> Nigerian Standard Approved</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quantity and Add to Cart -->
+            <div class="mb-4">
+                <label class="form-label fw-semibold mb-2">Quantity</label>
+                <div class="d-flex gap-3 mb-3">
+                    <div class="quantity-selector d-flex align-items-center border rounded-3 overflow-hidden" style="border-color: var(--border) !important;">
+                        <button class="btn btn-light border-0" onclick="decrementQty()" style="padding: 10px 15px;">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <input type="number" id="quantity" value="1" min="1" max="{{ product.stock }}" class="form-control text-center border-0" style="width: 65px; font-weight: 600;">
+                        <button class="btn btn-light border-0" onclick="incrementQty()" style="padding: 10px 15px;">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    <button class="btn btn-primary-custom flex-grow-1" onclick="addToCartWithQty({{ product.id }})" {% if product.stock == 0 %}disabled{% endif %} style="padding: 12px;">
+                        <i class="fas fa-shopping-cart me-2"></i> Add to Cart
+                    </button>
+                    <button class="btn btn-outline-custom" onclick="addToWishlist({{ product.id }})" style="padding: 12px 20px;">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                </div>
+                
+                <!-- Buy Now Button -->
+                <button class="btn w-100" onclick="buyNow({{ product.id }})" style="background: var(--dark); color: white; padding: 12px; border-radius: 30px; font-weight: 600;" {% if product.stock == 0 %}disabled{% endif %}>
+                    <i class="fas fa-bolt me-2"></i> Buy Now
                 </button>
             </div>
             
-            <div class="card bg-light">
-                <div class="card-body">
-                    <h6>Product Details</h6>
-                    <ul class="list-unstyled mb-0">
-                        <li><i class="fas fa-tag me-2"></i> Category: {{ product.category }}</li>
-                        <li><i class="fas fa-box me-2"></i> Free Shipping on orders over ₦50,000</li>
-                        <li><i class="fas fa-undo me-2"></i> 7-day return policy</li>
+            <!-- Delivery Info Card -->
+            <div class="card border-0 shadow-sm rounded-3 mb-3">
+                <div class="card-body p-3">
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <i class="fas fa-truck fa-lg" style="color: var(--primary);"></i>
+                            <p class="small mb-0 mt-1">Free Shipping<br>Over ₦50,000</p>
+                        </div>
+                        <div class="col-4">
+                            <i class="fas fa-undo-alt fa-lg" style="color: var(--primary);"></i>
+                            <p class="small mb-0 mt-1">7-Day Return<br>No Questions Asked</p>
+                        </div>
+                        <div class="col-4">
+                            <i class="fas fa-shield-alt fa-lg" style="color: var(--primary);"></i>
+                            <p class="small mb-0 mt-1">Secure Payment<br>100% Protected</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Share Section -->
+            <div class="d-flex gap-3 align-items-center">
+                <span class="text-muted small">Share:</span>
+                <a href="#" class="text-decoration-none" style="color: #25D366;"><i class="fab fa-whatsapp fa-lg"></i></a>
+                <a href="#" class="text-decoration-none" style="color: #1877F2;"><i class="fab fa-facebook fa-lg"></i></a>
+                <a href="#" class="text-decoration-none" style="color: #E4405F;"><i class="fab fa-instagram fa-lg"></i></a>
+                <a href="#" class="text-decoration-none" style="color: #1DA1F2;"><i class="fab fa-twitter fa-lg"></i></a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Product Details Tabs -->
+    <div class="row mt-5" data-aos="fade-up">
+        <div class="col-12">
+            <ul class="nav nav-tabs" id="productTabs" role="tablist" style="border-bottom: 2px solid var(--border);">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="description-tab" data-bs-toggle="tab" data-bs-target="#description" type="button" role="tab" style="color: var(--dark); font-weight: 600; border: none; background: transparent; padding: 12px 24px;">
+                        <i class="fas fa-align-left me-2"></i>Description
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="specs-tab" data-bs-toggle="tab" data-bs-target="#specs" type="button" role="tab" style="color: var(--dark); font-weight: 600; border: none; background: transparent; padding: 12px 24px;">
+                        <i class="fas fa-list-ul me-2"></i>Specifications
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button" role="tab" style="color: var(--dark); font-weight: 600; border: none; background: transparent; padding: 12px 24px;">
+                        <i class="fas fa-star me-2"></i>Reviews ({{ reviews|length }})
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="shipping-tab" data-bs-toggle="tab" data-bs-target="#shipping" type="button" role="tab" style="color: var(--dark); font-weight: 600; border: none; background: transparent; padding: 12px 24px;">
+                        <i class="fas fa-truck me-2"></i>Shipping
+                    </button>
+                </li>
+            </ul>
+            
+            <div class="tab-content p-4 bg-white border rounded-bottom-3 shadow-sm" style="border: 1px solid var(--border); border-top: none;">
+                <!-- Description Tab -->
+                <div class="tab-pane fade show active" id="description" role="tabpanel">
+                    <h5 style="font-weight: 700;">Product Description</h5>
+                    <p style="color: var(--gray); line-height: 1.8;">{{ product.description }}</p>
+                    <p style="color: var(--gray); line-height: 1.8;">This premium {{ product.name }} is crafted with the highest quality materials to ensure durability and optimal performance in your kitchen. Whether you're a professional chef or a home cooking enthusiast, this utensil will elevate your culinary experience.</p>
+                    
+                    <h6 class="mt-4" style="font-weight: 700;">What's Included:</h6>
+                    <ul>
+                        <li>1 x {{ product.name }}</li>
+                        <li>User Manual</li>
+                        <li>Warranty Card</li>
+                        <li>Care Instructions</li>
                     </ul>
+                </div>
+                
+                <!-- Specifications Tab -->
+                <div class="tab-pane fade" id="specs" role="tabpanel">
+                    <h5 style="font-weight: 700;">Technical Specifications</h5>
+                    <table class="table table-borderless">
+                        <tr>
+                            <td style="width: 40%; font-weight: 600;">Material:</td>
+                            <td>High-Grade Stainless Steel / Aluminum Core</td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: 600;">Dimensions:</td>
+                            <td>28cm x 28cm x 10cm</td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: 600;">Weight:</td>
+                            <td>1.2 kg</td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: 600;">Color:</td>
+                            <td>{{ product.color|default('Gold/Bronze') }}</td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: 600;">Warranty:</td>
+                            <td>5 Years Limited Warranty</td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: 600;">Origin:</td>
+                            <td>Imported - Premium Quality</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <!-- Reviews Tab -->
+                <div class="tab-pane fade" id="reviews" role="tabpanel">
+                    <div class="row mb-4">
+                        <div class="col-md-4 text-center">
+                            <h1 style="font-size: 3rem; color: var(--primary);">{{ product.rating|default(4.5) }}</h1>
+                            <div class="mb-2">
+                                {% set rating = product.rating|default(4.5)|float %}
+                                {% for i in range(5) %}
+                                    {% if i < rating|round(0, 'floor')|int %}
+                                        <i class="fas fa-star" style="color: #FFD700;"></i>
+                                    {% elif (rating - (rating|round(0, 'floor')|int)) >= 0.5 and i == (rating|round(0, 'floor')|int) %}
+                                        <i class="fas fa-star-half-alt" style="color: #FFD700;"></i>
+                                    {% else %}
+                                        <i class="far fa-star" style="color: #FFD700;"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            <p class="text-muted">Based on {{ product.reviews|default(128) }} reviews</p>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="rating-bars">
+                                <div class="d-flex align-items-center mb-2">
+                                    <span style="width: 60px;">5 ★</span>
+                                    <div class="progress flex-grow-1 mx-2" style="height: 8px;">
+                                        <div class="progress-bar" style="width: 70%; background: var(--primary);"></div>
+                                    </div>
+                                    <span>70%</span>
+                                </div>
+                                <div class="d-flex align-items-center mb-2">
+                                    <span style="width: 60px;">4 ★</span>
+                                    <div class="progress flex-grow-1 mx-2" style="height: 8px;">
+                                        <div class="progress-bar" style="width: 20%; background: var(--primary);"></div>
+                                    </div>
+                                    <span>20%</span>
+                                </div>
+                                <div class="d-flex align-items-center mb-2">
+                                    <span style="width: 60px;">3 ★</span>
+                                    <div class="progress flex-grow-1 mx-2" style="height: 8px;">
+                                        <div class="progress-bar" style="width: 5%; background: var(--primary);"></div>
+                                    </div>
+                                    <span>5%</span>
+                                </div>
+                                <div class="d-flex align-items-center mb-2">
+                                    <span style="width: 60px;">2 ★</span>
+                                    <div class="progress flex-grow-1 mx-2" style="height: 8px;">
+                                        <div class="progress-bar" style="width: 3%; background: var(--primary);"></div>
+                                    </div>
+                                    <span>3%</span>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <span style="width: 60px;">1 ★</span>
+                                    <div class="progress flex-grow-1 mx-2" style="height: 8px;">
+                                        <div class="progress-bar" style="width: 2%; background: var(--primary);"></div>
+                                    </div>
+                                    <span>2%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Write Review Form -->
+                    {% if session.user %}
+                    <div class="card mb-4 rounded-4">
+                        <div class="card-body">
+                            <h6 class="mb-3"><i class="fas fa-pen me-2" style="color: var(--primary);"></i>Write a Review</h6>
+                            <form method="POST" action="/add-review/{{ product.id }}">
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">Rating</label>
+                                        <select name="rating" class="form-select" required>
+                                            <option value="">Select Rating</option>
+                                            <option value="5">★★★★★ (5) - Excellent</option>
+                                            <option value="4">★★★★☆ (4) - Very Good</option>
+                                            <option value="3">★★★☆☆ (3) - Good</option>
+                                            <option value="2">★★☆☆☆ (2) - Fair</option>
+                                            <option value="1">★☆☆☆☆ (1) - Poor</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-8 mb-3">
+                                        <label class="form-label">Review Title</label>
+                                        <input type="text" name="title" class="form-control" placeholder="e.g., Great quality!" required>
+                                    </div>
+                                    <div class="col-12 mb-3">
+                                        <label class="form-label">Your Review</label>
+                                        <textarea name="comment" class="form-control" rows="3" placeholder="Share your experience with this product..." required></textarea>
+                                    </div>
+                                    <div class="col-12">
+                                        <button type="submit" class="btn btn-primary-custom">Submit Review <i class="fas fa-paper-plane ms-2"></i></button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info rounded-4 mb-4">
+                        <i class="fas fa-info-circle me-2"></i> <a href="/login" class="alert-link">Login</a> to write a review and share your experience!
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Reviews List -->
+                    {% for review in reviews %}
+                    <div class="card mb-3 rounded-3">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    {% for i in range(review.rating) %}★{% endfor %}
+                                    {% for i in range(5 - review.rating) %}☆{% endfor %}
+                                </div>
+                                <small class="text-muted">{{ review.date }}</small>
+                            </div>
+                            <h6 class="mb-2">{{ review.title }}</h6>
+                            <p class="text-muted mb-2">{{ review.comment }}</p>
+                            <small class="text-muted">
+                                <i class="fas fa-user me-1"></i> {{ review.user }} 
+                                {% if review.verified_purchase %} 
+                                    <span class="badge bg-success ms-2">Verified Purchase</span>
+                                {% endif %}
+                            </small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Shipping Tab -->
+                <div class="tab-pane fade" id="shipping" role="tabpanel">
+                    <h5 style="font-weight: 700;">Shipping Information</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <i class="fas fa-map-marker-alt me-2" style="color: var(--primary);"></i>
+                                <strong>Delivery Locations:</strong>
+                                <p class="text-muted mt-1">We deliver nationwide across all 36 states in Nigeria including FCT Abuja.</p>
+                            </div>
+                            <div class="mb-3">
+                                <i class="fas fa-clock me-2" style="color: var(--primary);"></i>
+                                <strong>Delivery Time:</strong>
+                                <p class="text-muted mt-1">2-5 business days for major cities, 5-7 business days for remote areas.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <i class="fas fa-truck me-2" style="color: var(--primary);"></i>
+                                <strong>Shipping Rates:</strong>
+                                <ul class="text-muted mt-1">
+                                    <li>Free Shipping on orders over ₦50,000</li>
+                                    <li>Lagos: ₦2,500</li>
+                                    <li>Abuja & Port Harcourt: ₦3,500</li>
+                                    <li>Other States: ₦4,500 - ₦5,500</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-success mt-3">
+                        <i class="fas fa-truck-fast me-2"></i> Order before 2 PM for same-day dispatch!
+                    </div>
                 </div>
             </div>
         </div>
     </div>
     
-    <!-- Reviews Section -->
-    <div class="mt-5">
-        <h3>Customer Reviews</h3>
-        
-        {% if session.user %}
-        <div class="card mb-4">
-            <div class="card-body">
-                <h5>Write a Review</h5>
-                <form method="POST" action="/add-review/{{ product.id }}">
-                    <div class="mb-3">
-                        <label class="form-label">Rating</label>
-                        <select name="rating" class="form-select" style="width: auto;" required>
-                            <option value="">Select Rating</option>
-                            <option value="5">★★★★★ (5)</option>
-                            <option value="4">★★★★☆ (4)</option>
-                            <option value="3">★★★☆☆ (3)</option>
-                            <option value="2">★★☆☆☆ (2)</option>
-                            <option value="1">★☆☆☆☆ (1)</option>
-                        </select>
+    <!-- Related Products Section (Optional) -->
+    <div class="mt-5" data-aos="fade-up">
+        <h3 class="mb-4" style="font-family: 'Cormorant Garamond', serif;">You May Also Like</h3>
+        <div class="row g-4">
+            <div class="col-md-3">
+                <div class="product-card text-center">
+                    <div class="product-image" style="height: 150px;">
+                        <i class="fas fa-knife fa-3x" style="color: var(--primary);"></i>
                     </div>
-                    <div class="mb-3">
-                        <input type="text" name="title" class="form-control" placeholder="Review title" required>
+                    <div class="p-3">
+                        <h6>Chef's Knife</h6>
+                        <span class="fw-bold" style="color: var(--primary);">₦12,500</span>
                     </div>
-                    <div class="mb-3">
-                        <textarea name="comment" class="form-control" rows="3" placeholder="Write your review here..." required></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-terracotta">Submit Review</button>
-                </form>
+                </div>
             </div>
-        </div>
-        {% else %}
-        <div class="alert alert-info">
-            <a href="/login">Login</a> to write a review
-        </div>
-        {% endif %}
-        
-        {% for review in reviews %}
-        <div class="card mb-3">
-            <div class="card-body">
-                <div class="d-flex justify-content-between">
-                    <div>
-                        <div class="mb-1">
-                            {% for i in range(review.rating) %}★{% endfor %}
-                            {% for i in range(5 - review.rating) %}☆{% endfor %}
-                        </div>
-                        <h6>{{ review.title }}</h6>
-                        <p>{{ review.comment }}</p>
-                        <small class="text-muted">By {{ review.user }} on {{ review.date }}</small>
+            <div class="col-md-3">
+                <div class="product-card text-center">
+                    <div class="product-image" style="height: 150px;">
+                        <i class="fas fa-utensils fa-3x" style="color: var(--primary);"></i>
+                    </div>
+                    <div class="p-3">
+                        <h6>Cooking Spatula</h6>
+                        <span class="fw-bold" style="color: var(--primary);">₦4,500</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="product-card text-center">
+                    <div class="product-image" style="height: 150px;">
+                        <i class="fas fa-blender fa-3x" style="color: var(--primary);"></i>
+                    </div>
+                    <div class="p-3">
+                        <h6>Blender Set</h6>
+                        <span class="fw-bold" style="color: var(--primary);">₦35,000</span>
                     </div>
                 </div>
             </div>
         </div>
-        {% endfor %}
     </div>
 </div>
+
+<!-- Zoom Modal -->
+<div class="modal fade" id="zoomModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content" style="border-radius: 20px;">
+            <div class="modal-body text-center p-4">
+                <i class="fas fa-{{ product.image }} fa-10x" style="color: var(--primary);"></i>
+                <p class="mt-3 text-muted">{{ product.name }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .breadcrumb-item + .breadcrumb-item::before {
+        content: "›";
+    }
+    
+    .thumbnail {
+        transition: all 0.3s ease;
+    }
+    
+    .thumbnail:hover {
+        border-color: var(--primary) !important;
+        transform: scale(1.05);
+    }
+    
+    .nav-tabs .nav-link {
+        transition: all 0.3s ease;
+    }
+    
+    .nav-tabs .nav-link:hover {
+        color: var(--primary) !important;
+    }
+    
+    .nav-tabs .nav-link.active {
+        color: var(--primary) !important;
+        border-bottom: 2px solid var(--primary) !important;
+        background: transparent;
+    }
+    
+    .quantity-selector input::-webkit-inner-spin-button,
+    .quantity-selector input::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    
+    @media (max-width: 768px) {
+        .product-gallery {
+            margin-bottom: 2rem;
+        }
+        .thumbnail {
+            width: 60px !important;
+            height: 60px !important;
+        }
+    }
+</style>
 
 <script>
 function decrementQty() {
     let input = document.getElementById('quantity');
-    if (input.value > 1) input.value--;
+    let current = parseInt(input.value);
+    if (current > 1) {
+        input.value = current - 1;
+    }
 }
+
 function incrementQty() {
     let input = document.getElementById('quantity');
+    let current = parseInt(input.value);
     let max = parseInt(input.max);
-    if (input.value < max) input.value++;
+    if (current < max) {
+        input.value = current + 1;
+    }
 }
+
 function addToCartWithQty(productId) {
+    let quantity = parseInt(document.getElementById('quantity').value);
     fetch('/add-to-cart', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({product_id: productId})
-    }).then(() => {
-        updateCartCount();
-        showFlash('Added to cart!', 'success');
+        body: JSON.stringify({product_id: productId, quantity: quantity})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            updateCartCount();
+            showFlash(`Added ${quantity} item(s) to cart!`, 'success');
+        } else {
+            showFlash(data.error || 'Error adding to cart', 'danger');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showFlash('Error adding to cart', 'danger');
     });
 }
+
+function buyNow(productId) {
+    let quantity = parseInt(document.getElementById('quantity').value);
+    fetch('/add-to-cart', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({product_id: productId, quantity: quantity})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            updateCartCount();
+            window.location.href = '/cart';
+        } else {
+            showFlash(data.error || 'Error', 'danger');
+        }
+    });
+}
+
+function zoomImage() {
+    const modal = new bootstrap.Modal(document.getElementById('zoomModal'));
+    modal.show();
+}
+
+// Thumbnail click handler
+document.querySelectorAll('.thumbnail').forEach((thumb, index) => {
+    thumb.addEventListener('click', function() {
+        document.querySelectorAll('.thumbnail').forEach(t => t.style.borderColor = 'transparent');
+        this.style.borderColor = 'var(--primary)';
+        // Change main image (for demo purposes)
+        const icon = this.querySelector('i').className;
+        const mainImage = document.getElementById('mainProductImage');
+        mainImage.className = icon;
+    });
+});
 </script>
 {% endblock %}

@@ -1,32 +1,188 @@
 {% extends "base.html" %}
 
+{% block title %}About Us - Golden Kitchen Nigeria{% endblock %}
+
 {% block content %}
+<!-- About Hero Section -->
+<section style="position: relative; padding: 80px 0; overflow: hidden;">
+    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;">
+        <video autoplay muted loop playsinline style="width: 100%; height: 100%; object-fit: cover; opacity: 0.3;">
+            <source src="https://cdn.pixabay.com/video/2023/02/01/148481-791778886_large.mp4" type="video/mp4">
+        </video>
+    </div>
+    <div class="container text-center" style="position: relative; z-index: 2;">
+        <h1 class="display-4 fw-bold" style="font-family: 'Cormorant Garamond', serif;">
+            <i class="fas fa-utensils me-3" style="color: var(--primary);"></i>About Golden Kitchen Nigeria
+        </h1>
+        <p class="lead text-muted mt-3" style="max-width: 700px; margin: 0 auto;">Premium cooking utensils for every Nigerian kitchen</p>
+    </div>
+</section>
+
 <div class="container my-5">
-    <div class="row">
-        <div class="col-md-8 mx-auto text-center">
-            <h1>About Golden Kitchen Nigeria</h1>
-            <p class="lead mt-4">We are passionate about providing high-quality cooking utensils to Nigerian homes and professional kitchens.</p>
-            <p>Founded in 2024, Golden Kitchen Nigeria has quickly become a trusted name for premium kitchenware. We source our products from reputable manufacturers worldwide and bring them directly to your doorstep.</p>
-            <p>Our mission is to make professional-grade cooking tools accessible to every Nigerian who loves to cook.</p>
-            <hr class="my-4">
-            <h4>Why Choose Us?</h4>
-            <div class="row mt-4">
-                <div class="col-md-4">
-                    <i class="fas fa-truck fa-2x text-terracotta"></i>
-                    <h5 class="mt-2">Fast Delivery</h5>
-                    <p>Delivery within 2-5 business days</p>
-                </div>
-                <div class="col-md-4">
-                    <i class="fas fa-shield-alt fa-2x text-terracotta"></i>
-                    <h5 class="mt-2">Quality Guarantee</h5>
-                    <p>30-day return policy</p>
-                </div>
-                <div class="col-md-4">
-                    <i class="fas fa-headset fa-2x text-terracotta"></i>
-                    <h5 class="mt-2">24/7 Support</h5>
-                    <p>Customer service always ready</p>
+    <!-- Our Story -->
+    <div class="row align-items-center mb-5" data-aos="fade-up">
+        <div class="col-lg-6">
+            <div class="pe-lg-4">
+                <span class="badge mb-3" style="background: var(--primary); color: white; padding: 8px 16px;">Our Story</span>
+                <h2 style="font-family: 'Cormorant Garamond', serif;">Passionate About Quality Cookware</h2>
+                <p class="text-muted mt-3">Founded in 2024, Golden Kitchen Nigeria has quickly become a trusted name for premium kitchenware across Nigeria. We understand that great cooking starts with great tools, which is why we're committed to bringing the finest cooking utensils to your doorstep.</p>
+                <p class="text-muted">We source our products from reputable manufacturers worldwide, ensuring every item meets our strict quality standards. Whether you're a professional chef or a home cooking enthusiast, we have the perfect tools for your culinary journey.</p>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="rounded-4 overflow-hidden shadow-lg">
+                <img src="https://via.placeholder.com/600x400/C6A43F/FFFFFF?text=Our+Kitchen" class="img-fluid w-100" alt="Our Kitchen">
+            </div>
+        </div>
+    </div>
+    
+    <!-- Mission & Vision -->
+    <div class="row g-4 mb-5" data-aos="fade-up">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-body p-4 text-center">
+                    <div style="width: 70px; height: 70px; background: rgba(198,164,63,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
+                        <i class="fas fa-bullseye fa-2x" style="color: var(--primary);"></i>
+                    </div>
+                    <h4>Our Mission</h4>
+                    <p class="text-muted">To provide every Nigerian home and professional kitchen with high-quality, affordable cooking utensils that inspire culinary creativity and excellence.</p>
                 </div>
             </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-body p-4 text-center">
+                    <div style="width: 70px; height: 70px; background: rgba(198,164,63,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
+                        <i class="fas fa-eye fa-2x" style="color: var(--primary);"></i>
+                    </div>
+                    <h4>Our Vision</h4>
+                    <p class="text-muted">To become Nigeria's most trusted and preferred destination for premium kitchenware, setting the standard for quality, service, and customer satisfaction.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Why Choose Us -->
+    <div class="text-center mb-5" data-aos="fade-up">
+        <h2 style="font-family: 'Cormorant Garamond', serif;">Why Choose Us?</h2>
+        <p class="text-muted">What makes Golden Kitchen Nigeria different</p>
+    </div>
+    
+    <div class="row g-4 mb-5" data-aos="fade-up">
+        <div class="col-md-4">
+            <div class="text-center p-4 rounded-4 h-100" style="background: var(--gray-light);">
+                <i class="fas fa-truck fa-3x" style="color: var(--primary); margin-bottom: 15px;"></i>
+                <h5>Fast Nationwide Delivery</h5>
+                <p class="text-muted small">Delivery within 2-5 business days across all 36 states in Nigeria</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="text-center p-4 rounded-4 h-100" style="background: var(--gray-light);">
+                <i class="fas fa-shield-alt fa-3x" style="color: var(--primary); margin-bottom: 15px;"></i>
+                <h5>Quality Guarantee</h5>
+                <p class="text-muted small">Premium materials, authentic products, and manufacturer warranty</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="text-center p-4 rounded-4 h-100" style="background: var(--gray-light);">
+                <i class="fas fa-headset fa-3x" style="color: var(--primary); margin-bottom: 15px;"></i>
+                <h5>24/7 Customer Support</h5>
+                <p class="text-muted small">Dedicated support team ready to assist you anytime, anywhere</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Core Values -->
+    <div class="row g-4 mb-5" data-aos="fade-up">
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div style="background: linear-gradient(135deg, var(--primary), var(--primary-dark)); padding: 20px; color: white;">
+                    <h4 class="mb-0 text-center">Our Core Values</h4>
+                </div>
+                <div class="card-body p-4">
+                    <div class="mb-3">
+                        <div class="d-flex align-items-center gap-3 mb-2">
+                            <i class="fas fa-gem fa-lg" style="color: var(--primary);"></i>
+                            <strong>Quality First</strong>
+                        </div>
+                        <p class="text-muted small ps-4">We never compromise on quality. Every product is carefully selected.</p>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex align-items-center gap-3 mb-2">
+                            <i class="fas fa-heart fa-lg" style="color: var(--primary);"></i>
+                            <strong>Customer Focus</strong>
+                        </div>
+                        <p class="text-muted small ps-4">Your satisfaction is our top priority. We're here to help you succeed.</p>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex align-items-center gap-3 mb-2">
+                            <i class="fas fa-handshake fa-lg" style="color: var(--primary);"></i>
+                            <strong>Integrity</strong>
+                        </div>
+                        <p class="text-muted small ps-4">Honest pricing, transparent policies, and ethical business practices.</p>
+                    </div>
+                    <div>
+                        <div class="d-flex align-items-center gap-3 mb-2">
+                            <i class="fas fa-lightbulb fa-lg" style="color: var(--primary);"></i>
+                            <strong>Innovation</strong>
+                        </div>
+                        <p class="text-muted small ps-4">Constantly improving and bringing new products to enhance your kitchen.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm rounded-4 text-center p-4 h-100" style="background: linear-gradient(135deg, var(--dark), #2D2D2D); color: white;">
+                <i class="fas fa-quote-left fa-3x mb-3" style="color: var(--primary);"></i>
+                <p class="lead" style="font-style: italic;">"Great cooking deserves great tools. We're on a mission to make premium kitchenware accessible to every Nigerian home."</p>
+                <hr style="background: rgba(255,255,255,0.2);">
+                <div>
+                    <i class="fas fa-utensils me-2" style="color: var(--primary);"></i>
+                    <strong>Golden Kitchen Nigeria Team</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Stats Section -->
+    <div class="row g-4 text-center" data-aos="fade-up">
+        <div class="col-md-3 col-6">
+            <div class="p-3">
+                <h2 style="color: var(--primary); font-weight: 700;">5000+</h2>
+                <p class="text-muted small">Happy Customers</p>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="p-3">
+                <h2 style="color: var(--primary); font-weight: 700;">50+</h2>
+                <p class="text-muted small">Premium Products</p>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="p-3">
+                <h2 style="color: var(--primary); font-weight: 700;">36</h2>
+                <p class="text-muted small">States Covered</p>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="p-3">
+                <h2 style="color: var(--primary); font-weight: 700;">24/7</h2>
+                <p class="text-muted small">Support Available</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- CTA Section -->
+    <div class="text-center mt-5 p-5 rounded-4" style="background: linear-gradient(135deg, var(--gray-light), white); border: 1px solid var(--border);" data-aos="fade-up">
+        <h3 style="font-family: 'Cormorant Garamond', serif;">Ready to upgrade your kitchen?</h3>
+        <p class="text-muted">Shop our collection of premium cooking utensils today</p>
+        <div class="d-flex gap-3 justify-content-center mt-3">
+            <a href="/products" class="btn btn-primary-custom">
+                <i class="fas fa-store me-2"></i>Shop Now
+            </a>
+            <a href="/contact" class="btn btn-outline-custom">
+                <i class="fas fa-envelope me-2"></i>Contact Us
+            </a>
         </div>
     </div>
 </div>

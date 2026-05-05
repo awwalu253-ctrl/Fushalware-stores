@@ -1,0 +1,656 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Add Product - Admin{% endblock %}
+
+{% block page_title %}
+<i class="fas fa-plus-circle me-2" style="color: var(--primary);"></i>Add New Product
+{% endblock %}
+
+{% block admin_content %}
+<div class="add-product-page">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <!-- Card Header -->
+                <div class="card-header bg-white py-3 border-0" style="border-bottom: 1px solid var(--border);">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="product-icon-wrapper">
+                            <i class="fas fa-box-open fa-2x" style="color: var(--primary);"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-0">Create New Product</h5>
+                            <small class="text-muted">Fill in the details to add a product to your store</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Card Body -->
+                <div class="card-body p-4">
+                    <form method="POST" id="productForm" enctype="multipart/form-data">
+                        <div class="row g-3">
+                            <!-- Product Name -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">
+                                    <i class="fas fa-tag me-1" style="color: var(--primary);"></i>Product Name *
+                                </label>
+                                <input type="text" name="name" class="form-control form-control-lg" required placeholder="e.g., Professional Chef Knife">
+                                <small class="text-muted">Enter the full product name as it will appear to customers</small>
+                            </div>
+                            
+                            <!-- Category -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">
+                                    <i class="fas fa-folder me-1" style="color: var(--primary);"></i>Category *
+                                </label>
+                                <select name="category" class="form-select form-select-lg" required>
+                                    <option value="">Select Category</option>
+                                    <option value="Knives">🔪 Knives</option>
+                                    <option value="Pans">🍳 Pans</option>
+                                    <option value="Pots">🍲 Pots</option>
+                                    <option value="Utensils">🥄 Utensils</option>
+                                    <option value="Bakeware">🍰 Bakeware</option>
+                                    <option value="Kitchen Tools">🔧 Kitchen Tools</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Price -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">
+                                    <i class="fas fa-naira-sign me-1" style="color: var(--primary);"></i>Price (₦) *
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text" style="background: var(--gray-light); border-right: none;">₦</span>
+                                    <input type="number" name="price" class="form-control" step="100" required placeholder="0" style="border-left: none;">
+                                </div>
+                            </div>
+                            
+                            <!-- Compare Price -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">
+                                    <i class="fas fa-tag me-1" style="color: var(--primary);"></i>Compare Price
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text" style="background: var(--gray-light); border-right: none;">₦</span>
+                                    <input type="number" name="compare_price" class="form-control" step="100" placeholder="0" style="border-left: none;">
+                                </div>
+                                <small class="text-muted">Original price for discount display</small>
+                            </div>
+                            
+                            <!-- Stock Quantity -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">
+                                    <i class="fas fa-boxes me-1" style="color: var(--primary);"></i>Stock Quantity *
+                                </label>
+                                <input type="number" name="stock" class="form-control" required value="0" min="0">
+                                <small class="text-muted">Initial inventory count</small>
+                            </div>
+                            
+                            <!-- Product Image Upload -->
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">
+                                    <i class="fas fa-image me-1" style="color: var(--primary);"></i>Product Image
+                                </label>
+                                <div class="image-upload-container">
+                                    <div class="image-preview" id="imagePreview" onclick="document.getElementById('productImage').click()">
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                        <p>Click to upload product image</p>
+                                        <small class="text-muted">PNG, JPG, JPEG up to 5MB</small>
+                                    </div>
+                                    <input type="file" name="product_image" id="productImage" accept="image/*" style="display: none;" onchange="previewImage(this)">
+                                </div>
+                                <small class="text-muted">Recommended size: 500x500px. Leave empty to use icon.</small>
+                            </div>
+                            
+                            <!-- OR Divider -->
+                            <div class="col-12">
+                                <div class="divider text-center position-relative my-2">
+                                    <hr>
+                                    <span class="px-3 bg-white" style="position: relative; top: -12px; color: var(--gray); font-size: 0.85rem;">OR</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Icon/Image (Fallback) -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">
+                                    <i class="fas fa-icons me-1" style="color: var(--primary);"></i>Product Icon (Fallback)
+                                </label>
+                                <select name="image" class="form-select" id="iconSelect">
+                                    <option value="knife">🔪 Knife</option>
+                                    <option value="pan">🍳 Pan</option>
+                                    <option value="pot">🍲 Pot</option>
+                                    <option value="utensil">🥄 Utensil</option>
+                                    <option value="cup">☕ Cup/Mug</option>
+                                    <option value="cutting-board">🔪 Cutting Board</option>
+                                    <option value="blender">🥤 Blender</option>
+                                    <option value="fork">🍴 Fork/Spoon</option>
+                                    <option value="kitchen-set">🍽️ Kitchen Set</option>
+                                </select>
+                                <small class="text-muted">Used if no image is uploaded</small>
+                            </div>
+                            
+                            <!-- SKU -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">
+                                    <i class="fas fa-barcode me-1" style="color: var(--primary);"></i>SKU (Stock Keeping Unit)
+                                </label>
+                                <input type="text" name="sku" class="form-control" placeholder="e.g., GK-PROD-001">
+                                <small class="text-muted">Unique product code - leave blank for auto-generation</small>
+                            </div>
+                            
+                            <!-- Description -->
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">
+                                    <i class="fas fa-align-left me-1" style="color: var(--primary);"></i>Product Description *
+                                </label>
+                                <textarea name="description" class="form-control" rows="5" required placeholder="Describe the product features, benefits, and specifications..."></textarea>
+                                <small class="text-muted">Detailed description that will appear on the product page</small>
+                            </div>
+                            
+                            <!-- Short Description -->
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">
+                                    <i class="fas fa-info-circle me-1" style="color: var(--primary);"></i>Short Description
+                                </label>
+                                <textarea name="short_description" class="form-control" rows="2" placeholder="Brief summary for product cards (max 100 characters)"></textarea>
+                                <small class="text-muted">Brief description shown on product cards</small>
+                            </div>
+                            
+                            <!-- Status Toggles -->
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Product Status</label>
+                                <div class="d-flex gap-4 flex-wrap">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="featured" id="featured">
+                                        <label class="form-check-label" for="featured">
+                                            <i class="fas fa-star me-1" style="color: #f59e0b;"></i>Featured Product
+                                        </label>
+                                    </div>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="bestseller" id="bestseller">
+                                        <label class="form-check-label" for="bestseller">
+                                            <i class="fas fa-fire me-1" style="color: #ef4444;"></i>Best Seller
+                                        </label>
+                                    </div>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="active" id="active" checked>
+                                        <label class="form-check-label" for="active">
+                                            <i class="fas fa-check-circle me-1" style="color: #2D6A4F;"></i>Active (Visible in store)
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Shipping Details -->
+                            <div class="col-12 mt-3">
+                                <hr>
+                                <h6 class="mb-3"><i class="fas fa-weight-hanging me-2" style="color: var(--primary);"></i>Shipping Details (Optional)</h6>
+                                <div class="row g-3">
+                                    <div class="col-md-3">
+                                        <label class="form-label small">Weight (kg)</label>
+                                        <input type="number" name="weight" class="form-control" step="0.1" placeholder="0.5">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label small">Length (cm)</label>
+                                        <input type="number" name="length" class="form-control" step="0.1" placeholder="30">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label small">Width (cm)</label>
+                                        <input type="number" name="width" class="form-control" step="0.1" placeholder="20">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label small">Height (cm)</label>
+                                        <input type="number" name="height" class="form-control" step="0.1" placeholder="10">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Live Preview -->
+                            <div class="col-12 mt-3">
+                                <hr>
+                                <h6 class="mb-3"><i class="fas fa-eye me-2" style="color: var(--primary);"></i>Live Preview</h6>
+                                <div class="preview-card p-3 rounded-3" style="background: var(--gray-light);">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="preview-icon">
+                                            <img id="previewUploadedImage" src="" style="width: 60px; height: 60px; object-fit: cover; border-radius: 12px; display: none;">
+                                            <i id="previewIcon" class="fas fa-box fa-3x" style="color: var(--primary);"></i>
+                                        </div>
+                                        <div>
+                                            <div class="preview-name fw-semibold">Product Name</div>
+                                            <div class="preview-price fw-bold" style="color: var(--primary);">₦0</div>
+                                            <div class="preview-category small text-muted">Category</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <hr class="my-4">
+                        
+                        <!-- Form Actions -->
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                            <div>
+                                <a href="/admin/products" class="btn btn-admin-outline">
+                                    <i class="fas fa-arrow-left me-1"></i> Cancel
+                                </a>
+                                <button type="button" class="btn btn-admin-outline" onclick="previewProduct()">
+                                    <i class="fas fa-eye me-1"></i> Preview
+                                </button>
+                            </div>
+                            <div>
+                                <button type="reset" class="btn btn-admin-outline me-2">
+                                    <i class="fas fa-undo me-1"></i> Reset
+                                </button>
+                                <button type="submit" class="btn btn-admin-primary" id="submitBtn">
+                                    <i class="fas fa-save me-1"></i> Save Product
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Quick Tips -->
+            <div class="card border-0 shadow-sm rounded-4 mt-4 overflow-hidden">
+                <div class="card-header bg-white py-3 border-0" style="border-bottom: 1px solid var(--border);">
+                    <h6 class="mb-0">
+                        <i class="fas fa-lightbulb me-2" style="color: var(--primary);"></i>Quick Tips
+                    </h6>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="d-flex gap-2">
+                                <i class="fas fa-check-circle" style="color: var(--primary);"></i>
+                                <small class="text-muted">Use high-quality product images (500x500px)</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex gap-2">
+                                <i class="fas fa-check-circle" style="color: var(--primary);"></i>
+                                <small class="text-muted">Set competitive prices with discounts</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex gap-2">
+                                <i class="fas fa-check-circle" style="color: var(--primary);"></i>
+                                <small class="text-muted">Add detailed descriptions for better SEO</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Preview Modal -->
+<div class="modal fade" id="previewModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content rounded-4">
+            <div class="modal-header border-0">
+                <h5 class="modal-title">Product Preview</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="previewContent"></div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-admin-outline" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.add-product-page {
+    animation: fadeIn 0.3s ease;
+}
+
+/* Form Styling */
+.form-control, .form-select {
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    padding: 10px 14px;
+    transition: all 0.2s;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(198, 164, 63, 0.1);
+}
+
+.form-control-lg {
+    font-size: 1rem;
+    padding: 12px 16px;
+}
+
+.form-check-input:checked {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+.form-check-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(198, 164, 63, 0.2);
+}
+
+/* Input Group */
+.input-group-text {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    color: var(--primary);
+}
+
+/* Image Upload */
+.image-upload-container {
+    width: 100%;
+}
+
+.image-preview {
+    width: 100%;
+    height: 200px;
+    border: 2px dashed #cbd5e1;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    background: #f8fafc;
+}
+
+.image-preview:hover {
+    border-color: var(--primary);
+    background: rgba(198, 164, 63, 0.05);
+}
+
+.image-preview i {
+    font-size: 48px;
+    color: var(--primary);
+    margin-bottom: 12px;
+}
+
+.image-preview p {
+    margin-bottom: 5px;
+    color: var(--dark);
+    font-weight: 500;
+}
+
+.image-preview.has-image {
+    border-color: var(--primary);
+    background: rgba(198, 164, 63, 0.1);
+}
+
+.image-preview.has-image i {
+    display: none;
+}
+
+/* Divider */
+.divider hr {
+    margin: 0;
+}
+
+/* Product Icon Wrapper */
+.product-icon-wrapper {
+    width: 60px;
+    height: 60px;
+    background: rgba(198, 164, 63, 0.1);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Preview Card */
+.preview-card {
+    transition: all 0.2s;
+}
+
+.preview-icon {
+    transition: all 0.3s;
+    min-width: 70px;
+}
+
+/* Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .card-body {
+        padding: 20px;
+    }
+    
+    .product-icon-wrapper {
+        width: 45px;
+        height: 45px;
+    }
+    
+    .form-control, .form-select {
+        font-size: 0.9rem;
+        padding: 8px 12px;
+    }
+    
+    .d-flex.justify-content-between {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .image-preview {
+        height: 160px;
+    }
+    
+    .image-preview i {
+        font-size: 36px;
+    }
+}
+</style>
+
+<script>
+// Image preview function
+function previewImage(input) {
+    const preview = document.getElementById('imagePreview');
+    const previewUploadedImg = document.getElementById('previewUploadedImage');
+    const previewIcon = document.getElementById('previewIcon');
+    
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            // Update the upload area
+            preview.style.backgroundImage = `url(${e.target.result})`;
+            preview.style.backgroundSize = 'cover';
+            preview.style.backgroundPosition = 'center';
+            preview.classList.add('has-image');
+            
+            // Update live preview
+            previewUploadedImg.src = e.target.result;
+            previewUploadedImg.style.display = 'block';
+            previewIcon.style.display = 'none';
+        }
+        
+        reader.readAsDataURL(input.files[0]);
+    } else {
+        resetImagePreview();
+    }
+}
+
+function resetImagePreview() {
+    const preview = document.getElementById('imagePreview');
+    const previewUploadedImg = document.getElementById('previewUploadedImage');
+    const previewIcon = document.getElementById('previewIcon');
+    
+    preview.style.backgroundImage = '';
+    preview.classList.remove('has-image');
+    previewUploadedImg.style.display = 'none';
+    previewIcon.style.display = 'block';
+}
+
+// Live preview update
+function updateLivePreview() {
+    const name = document.querySelector('input[name="name"]').value || 'Product Name';
+    const price = document.querySelector('input[name="price"]').value || '0';
+    const category = document.querySelector('select[name="category"]').value || 'Category';
+    
+    document.querySelector('.preview-name').textContent = name;
+    document.querySelector('.preview-price').textContent = `₦${parseInt(price).toLocaleString()}`;
+    document.querySelector('.preview-category').textContent = category;
+}
+
+// Add event listeners for live preview
+document.querySelector('input[name="name"]')?.addEventListener('input', updateLivePreview);
+document.querySelector('input[name="price"]')?.addEventListener('input', updateLivePreview);
+document.querySelector('select[name="category"]')?.addEventListener('change', updateLivePreview);
+
+// Preview product function
+function previewProduct() {
+    const name = document.querySelector('input[name="name"]').value;
+    const price = document.querySelector('input[name="price"]').value;
+    const comparePrice = document.querySelector('input[name="compare_price"]').value;
+    const description = document.querySelector('textarea[name="description"]').value;
+    const category = document.querySelector('select[name="category"]').value;
+    const stock = document.querySelector('input[name="stock"]').value;
+    const imageFile = document.getElementById('productImage').files[0];
+    const featured = document.querySelector('input[name="featured"]').checked;
+    const bestseller = document.querySelector('input[name="bestseller"]').checked;
+    
+    let imageHtml = '';
+    if (imageFile) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            showPreviewModal(e.target.result);
+        };
+        reader.readAsDataURL(imageFile);
+    } else {
+        const iconMap = {
+            'knife': 'fa-kitchen-set', 'pan': 'fa-frying-pan', 'pot': 'fa-mug-hot',
+            'utensil': 'fa-utensils', 'cup': 'fa-mug-saucer', 'cutting-board': 'fa-kitchen-set',
+            'blender': 'fa-blender', 'fork': 'fa-utensil-spoon', 'kitchen-set': 'fa-kitchen-set'
+        };
+        const icon = document.querySelector('select[name="image"]').value;
+        const iconClass = iconMap[icon] || 'fa-box';
+        showPreviewModal(null, iconClass);
+    }
+}
+
+function showPreviewModal(imageSrc, iconClass) {
+    const name = document.querySelector('input[name="name"]').value || 'Product Name';
+    const price = document.querySelector('input[name="price"]').value || '0';
+    const comparePrice = document.querySelector('input[name="compare_price"]').value;
+    const description = document.querySelector('textarea[name="description"]').value;
+    const category = document.querySelector('select[name="category"]').value || 'Category';
+    const stock = document.querySelector('input[name="stock"]').value;
+    const featured = document.querySelector('input[name="featured"]').checked;
+    const bestseller = document.querySelector('input[name="bestseller"]').checked;
+    
+    let imageHtml = '';
+    if (imageSrc) {
+        imageHtml = `<img src="${imageSrc}" style="width: 100%; height: 100%; object-fit: cover;">`;
+    } else {
+        imageHtml = `<i class="fas ${iconClass} fa-5x" style="color: var(--primary);"></i>`;
+    }
+    
+    const previewHtml = `
+        <div class="card rounded-4 overflow-hidden" style="max-width: 400px; margin: 0 auto;">
+            <div class="product-image" style="height: 200px; background: linear-gradient(135deg, #FFF9F0, #FFF5E6); display: flex; align-items: center; justify-content: center;">
+                ${imageHtml}
+            </div>
+            <div class="p-4">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h5 class="mb-0">${name}</h5>
+                    ${bestseller ? '<span class="badge bg-warning">🔥 Best Seller</span>' : ''}
+                </div>
+                <p class="text-muted small">${category}</p>
+                <div class="mb-2">
+                    ${comparePrice ? `<span class="text-muted text-decoration-line-through me-2">₦${parseInt(comparePrice).toLocaleString()}</span>` : ''}
+                    <span class="fw-bold fs-4" style="color: var(--primary);">₦${parseInt(price).toLocaleString()}</span>
+                </div>
+                <p class="small text-muted">${(description || 'No description provided.').substring(0, 100)}${description && description.length > 100 ? '...' : ''}</p>
+                <div class="mb-2">
+                    <span class="badge ${stock > 0 ? 'bg-success' : 'bg-danger'}">${stock > 0 ? stock + ' in stock' : 'Out of Stock'}</span>
+                    ${featured ? '<span class="badge bg-info ms-1">Featured</span>' : ''}
+                </div>
+                <button class="btn btn-primary-custom w-100" disabled>Add to Cart</button>
+            </div>
+        </div>
+    `;
+    
+    const previewModal = new bootstrap.Modal(document.getElementById('previewModal'));
+    document.getElementById('previewContent').innerHTML = previewHtml;
+    previewModal.show();
+}
+
+// Form validation
+document.getElementById('productForm').addEventListener('submit', function(e) {
+    const name = document.querySelector('input[name="name"]').value;
+    const price = document.querySelector('input[name="price"]').value;
+    const stock = document.querySelector('input[name="stock"]').value;
+    const description = document.querySelector('textarea[name="description"]').value;
+    const category = document.querySelector('select[name="category"]').value;
+    
+    if (!name.trim()) {
+        e.preventDefault();
+        showFlash('Product name is required', 'danger');
+        return;
+    }
+    
+    if (!category) {
+        e.preventDefault();
+        showFlash('Please select a category', 'danger');
+        return;
+    }
+    
+    if (!price || price <= 0) {
+        e.preventDefault();
+        showFlash('Please enter a valid price', 'danger');
+        return;
+    }
+    
+    if (stock === undefined || stock === null || stock < 0) {
+        e.preventDefault();
+        showFlash('Please enter a valid stock quantity', 'danger');
+        return;
+    }
+    
+    if (!description.trim()) {
+        e.preventDefault();
+        showFlash('Product description is required', 'danger');
+        return;
+    }
+    
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Saving...';
+});
+
+// Reset button
+document.querySelector('button[type="reset"]')?.addEventListener('click', function() {
+    setTimeout(() => {
+        resetImagePreview();
+        updateLivePreview();
+    }, 100);
+});
+
+// Auto-format price
+document.querySelectorAll('input[type="number"][step="100"]').forEach(input => {
+    input.addEventListener('blur', function() {
+        if (this.value) {
+            this.value = Math.round(this.value / 100) * 100;
+            updateLivePreview();
+        }
+    });
+});
+
+// Initialize
+updateLivePreview();
+</script>
+{% endblock %}

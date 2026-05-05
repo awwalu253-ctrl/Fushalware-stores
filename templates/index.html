@@ -3,54 +3,79 @@
 {% block title %}Home - Golden Kitchen Nigeria{% endblock %}
 
 {% block content %}
-<!-- Hero Section -->
-<section class="hero-section" style="background: linear-gradient(135deg, #FDEBD0 0%, #FDF2E9 100%); padding: 80px 0;">
-    <div class="container">
+<!-- Hero Section with Video Background -->
+<section class="hero-section" style="position: relative; padding: 100px 0; overflow: hidden; min-height: 85vh; display: flex; align-items: center;">
+    <!-- Video Background - COOKING/COOKWARE VIDEOS -->
+    <div class="hero-video-wrapper" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;">
+        <video autoplay muted loop playsinline style="width: 100%; height: 100%; object-fit: cover;">
+            <!-- Option 1: Professional kitchen cooking (Best for cookware store) -->
+            <source src="https://cdn.pixabay.com/video/2023/02/01/148481-791778886_large.mp4" type="video/mp4">
+            <!-- Option 2: Alternative - Chef cooking with utensils -->
+            <!-- <source src="https://cdn.pixabay.com/video/2019/02/04/20562-322943281_large.mp4" type="video/mp4"> -->
+            <!-- Option 3: Alternative - Kitchen utensils setup -->
+            <!-- <source src="https://cdn.pixabay.com/video/2023/11/21/189919-883422852_large.mp4" type="video/mp4"> -->
+        </video>
+        <div class="video-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.4) 100%);"></div>
+        <div class="gold-accent" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 30% 50%, rgba(198,164,63,0.15), transparent 70%);"></div>
+    </div>
+    
+    <div class="container" style="position: relative; z-index: 2;">
         <div class="row align-items-center">
-            <div class="col-lg-6">
-                <h1 class="display-4 fw-bold mb-3" style="background: linear-gradient(135deg, #E67E22, #D35400); -webkit-background-clip: text; background-clip: text; color: transparent;">
-                    Premium Cooking Utensils
+            <div class="col-lg-7" data-aos="fade-right">
+                <span style="color: var(--primary); font-weight: 600; letter-spacing: 3px; text-transform: uppercase; font-size: 0.8rem; background: rgba(0,0,0,0.5); padding: 0.3rem 1rem; border-radius: 30px; display: inline-block; backdrop-filter: blur(5px);">Welcome to Golden Kitchen</span>
+                <h1 class="display-4 fw-bold mb-3" style="font-family: 'Cormorant Garamond', serif; color: white; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+                    Premium Cooking <span style="color: var(--primary);">Utensils</span>
                 </h1>
-                <p class="lead mb-4">Quality kitchen tools delivered to your doorstep in Nigeria. Professional-grade cookware for every home chef.</p>
-                <div class="d-flex gap-3">
-                    <a href="/products" class="btn btn-terracotta btn-lg">Shop Now</a>
-                    <a href="/products?sort=bestseller" class="btn btn-outline-terracotta btn-lg">View Bestsellers</a>
+                <p class="lead mb-4" style="color: rgba(255,255,255,0.9);">Quality kitchen tools delivered to your doorstep in Nigeria. Professional-grade cookware for every home chef.</p>
+                <div class="d-flex gap-3 flex-wrap">
+                    <a href="/products" class="btn btn-primary-custom btn-lg">Shop Now <i class="fas fa-arrow-right ms-2"></i></a>
+                    <a href="/products?sort=bestseller" class="btn btn-outline-custom btn-lg" style="background: rgba(255,255,255,0.1); border-color: white; color: white;">View Bestsellers</a>
                 </div>
-                <div class="row mt-5">
+                <div class="row mt-5 pt-3">
                     <div class="col-4">
-                        <h3>5000+</h3>
-                        <p>Happy Customers</p>
+                        <h3 style="color: var(--primary); font-weight: 700; font-size: 1.8rem;">5000+</h3>
+                        <p style="color: rgba(255,255,255,0.8); font-size: 0.85rem;">Happy Customers</p>
                     </div>
                     <div class="col-4">
-                        <h3>50+</h3>
-                        <p>Products</p>
+                        <h3 style="color: var(--primary); font-weight: 700; font-size: 1.8rem;">50+</h3>
+                        <p style="color: rgba(255,255,255,0.8); font-size: 0.85rem;">Premium Products</p>
                     </div>
                     <div class="col-4">
-                        <h3>24/7</h3>
-                        <p>Support</p>
+                        <h3 style="color: var(--primary); font-weight: 700; font-size: 1.8rem;">24/7</h3>
+                        <p style="color: rgba(255,255,255,0.8); font-size: 0.85rem;">Customer Support</p>
                     </div>
                 </div>
             </div>
-            <div class="col-lg-6 text-center">
-                <img src="https://via.placeholder.com/500x400/E67E22/white?text=Premium+Cookware" class="img-fluid rounded-4 shadow-lg" alt="Cookware">
+            <div class="col-lg-5 text-center" data-aos="fade-left">
+                <div class="floating-cookware" style="position: relative;">
+                    <div class="floating-item" style="animation: float 3s ease-in-out infinite;">
+                        <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 30px; padding: 1.5rem; border: 1px solid rgba(255,255,255,0.2);">
+                            <i class="fas fa-utensils" style="font-size: 80px; color: var(--primary);"></i>
+                            <p style="color: white; margin-top: 1rem; font-weight: 500;">Premium Quality</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </section>
 
 <!-- Categories Section -->
-<section class="container my-5">
-    <h2 class="text-center mb-5">Shop by Category</h2>
+<section class="container my-5 py-4">
+    <div class="section-header" data-aos="fade-up">
+        <h2>Shop by Category</h2>
+        <p>Find the perfect kitchen tools for your culinary journey</p>
+    </div>
     <div class="row g-4">
         {% for cat in categories %}
-        <div class="col-md-3">
+        <div class="col-md-3 col-sm-6" data-aos="fade-up" data-aos-delay="{{ loop.index * 100 }}">
             <a href="/products?category={{ cat.name }}" class="text-decoration-none">
-                <div class="card text-center border-0 shadow-sm hover-shadow transition" style="border-radius: 15px;">
-                    <div class="card-body py-4">
-                        <i class="fas fa-{{ cat.icon }} fa-3x mb-3" style="color: #E67E22;"></i>
-                        <h5 class="mb-0">{{ cat.name }}</h5>
-                        <small class="text-muted">{{ cat.count }} Products</small>
+                <div class="category-card text-center" style="background: white; border-radius: 16px; padding: 2rem 1rem; transition: all 0.3s ease; border: 1px solid var(--border); height: 100%;">
+                    <div style="width: 70px; height: 70px; background: rgba(198, 164, 63, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                        <i class="fas fa-{{ cat.icon }} fa-2x" style="color: var(--primary);"></i>
                     </div>
+                    <h5 class="mb-1" style="color: var(--dark); font-family: 'Plus Jakarta Sans', sans-serif;">{{ cat.name }}</h5>
+                    <small class="text-muted">{{ cat.count }} Products</small>
                 </div>
             </a>
         </div>
@@ -58,31 +83,35 @@
     </div>
 </section>
 
-<!-- Featured Products -->
-<section class="bg-light py-5">
+<!-- Featured Products Section -->
+<section class="py-5" style="background: var(--gray-light); position: relative; overflow: hidden;">
+    <div style="position: absolute; top: -100px; right: -100px; width: 300px; height: 300px; background: radial-gradient(circle, rgba(198,164,63,0.05), transparent); border-radius: 50%;"></div>
     <div class="container">
-        <h2 class="text-center mb-5">Featured Products</h2>
+        <div class="section-header" data-aos="fade-up">
+            <h2>Featured Products</h2>
+            <p>Our handpicked selection of premium kitchen essentials</p>
+        </div>
         <div class="row g-4">
             {% for product in products %}
-            <div class="col-md-3">
-                <div class="card h-100 border-0 shadow-sm hover-shadow">
-                    <div class="card-body text-center">
-                        <div class="product-image mb-3">
-                            <i class="fas fa-{{ product.image }} fa-4x" style="color: #E67E22;"></i>
-                        </div>
-                        <h5 class="card-title">{{ product.name }}</h5>
-                        <p class="text-muted small">{{ product.description[:60] }}...</p>
-                        <div class="mb-2">
+            <div class="col-md-3 col-sm-6" data-aos="fade-up" data-aos-delay="{{ loop.index * 100 }}">
+                <div class="product-card">
+                    <div class="product-image" style="position: relative; overflow: hidden;">
+                        <i class="fas fa-{{ product.image }} fa-4x"></i>
+                    </div>
+                    <div class="p-3">
+                        <h5 class="card-title" style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 600; font-size: 1rem;">{{ product.name }}</h5>
+                        <p class="text-muted small" style="font-size: 0.75rem;">{{ product.description[:60] }}...</p>
+                        <div class="mb-3">
                             {% if product.compare_price %}
-                                <span class="text-muted text-decoration-line-through">₦{{ "{:,.0f}".format(product.compare_price) }}</span>
+                                <span class="text-muted text-decoration-line-through" style="font-size: 0.8rem;">₦{{ "{:,.0f}".format(product.compare_price) }}</span>
                             {% endif %}
-                            <span class="fw-bold fs-5" style="color: #E67E22;">₦{{ "{:,.0f}".format(product.price) }}</span>
+                            <span class="fw-bold fs-5" style="color: var(--primary);">₦{{ "{:,.0f}".format(product.price) }}</span>
                         </div>
                         <div class="d-flex gap-2">
-                            <button class="btn btn-terracotta flex-grow-1" onclick="addToCart({{ product.id }})">
-                                <i class="fas fa-shopping-cart"></i> Add
+                            <button class="btn btn-primary-custom flex-grow-1" onclick="addToCart({{ product.id }})" style="padding: 0.5rem;">
+                                <i class="fas fa-shopping-cart me-1"></i> Add
                             </button>
-                            <button class="btn btn-outline-terracotta" onclick="addToWishlist({{ product.id }})">
+                            <button class="btn btn-outline-custom" onclick="addToWishlist({{ product.id }})" style="padding: 0.5rem 1rem;">
                                 <i class="fas fa-heart"></i>
                             </button>
                         </div>
@@ -91,30 +120,56 @@
             </div>
             {% endfor %}
         </div>
-        <div class="text-center mt-4">
-            <a href="/products" class="btn btn-outline-terracotta">View All Products</a>
+        <div class="text-center mt-5" data-aos="fade-up">
+            <a href="/products" class="btn btn-outline-custom">View All Products <i class="fas fa-arrow-right ms-2"></i></a>
         </div>
     </div>
 </section>
 
-<!-- Bestsellers -->
-<section class="container my-5">
-    <h2 class="text-center mb-5">Best Sellers</h2>
+<!-- Bestsellers Section with Video Feature Card -->
+<section class="container my-5 py-4">
+    <div class="section-header" data-aos="fade-up">
+        <h2>Best Sellers</h2>
+        <p>Customer favorites that you'll love</p>
+    </div>
+    
+    <!-- Premium Video Feature Card - Kitchen Ambience -->
+    <div class="row mb-5" data-aos="fade-up">
+        <div class="col-12">
+            <div style="position: relative; border-radius: 24px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.1);">
+                <video autoplay muted loop playsinline style="width: 100%; height: 100%; object-fit: cover; min-height: 300px;">
+                    <!-- Professional kitchen cooking video -->
+                    <source src="https://cdn.pixabay.com/video/2019/09/19/25716-361896455_large.mp4" type="video/mp4">
+                </video>
+                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(0,0,0,0.6), rgba(0,0,0,0.3)); display: flex; align-items: center; justify-content: center; flex-direction: column; text-align: center; color: white;">
+                    <i class="fas fa-crown" style="font-size: 50px; color: var(--primary); margin-bottom: 1rem;"></i>
+                    <h3 style="color: white; font-size: 2rem;">Our Top Selling Collection</h3>
+                    <p style="color: rgba(255,255,255,0.9);">Discover what everyone is buying</p>
+                    <a href="/products?sort=bestseller" class="btn btn-primary-custom mt-3">Shop Bestsellers <i class="fas fa-arrow-right ms-2"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <div class="row g-4">
         {% for product in bestsellers %}
-        <div class="col-md-3">
-            <div class="card h-100 border-0 shadow-sm">
-                <div class="card-body text-center">
-                    <div class="position-relative">
-                        <span class="position-absolute top-0 start-0 badge bg-warning">🔥 Bestseller</span>
+        <div class="col-md-3 col-sm-6" data-aos="fade-up" data-aos-delay="{{ loop.index * 100 }}">
+            <div class="product-card position-relative">
+                <div class="position-absolute top-0 start-0 m-2 z-1">
+                    <span style="background: var(--primary); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.7rem; font-weight: 600;">
+                        🔥 Bestseller
+                    </span>
+                </div>
+                <div class="product-image">
+                    <i class="fas fa-{{ product.image }} fa-4x"></i>
+                </div>
+                <div class="p-3">
+                    <h5 class="card-title" style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 600; font-size: 1rem;">{{ product.name }}</h5>
+                    <div class="mb-3">
+                        <span class="fw-bold fs-5" style="color: var(--primary);">₦{{ "{:,.0f}".format(product.price) }}</span>
                     </div>
-                    <div class="product-image my-3">
-                        <i class="fas fa-{{ product.image }} fa-4x" style="color: #E67E22;"></i>
-                    </div>
-                    <h5 class="card-title">{{ product.name }}</h5>
-                    <p class="fw-bold fs-5" style="color: #E67E22;">₦{{ "{:,.0f}".format(product.price) }}</p>
-                    <button class="btn btn-terracotta w-100" onclick="addToCart({{ product.id }})">
-                        <i class="fas fa-shopping-cart"></i> Add to Cart
+                    <button class="btn btn-primary-custom w-100" onclick="addToCart({{ product.id }})" style="padding: 0.5rem;">
+                        <i class="fas fa-shopping-cart me-1"></i> Add to Cart
                     </button>
                 </div>
             </div>
@@ -123,24 +178,109 @@
     </div>
 </section>
 
+<!-- Benefits Section -->
+<section class="py-5" style="background: var(--gray-light);">
+    <div class="container">
+        <div class="row g-4 text-center">
+            <div class="col-md-3 col-sm-6" data-aos="fade-up">
+                <div style="width: 70px; height: 70px; background: rgba(198, 164, 63, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                    <i class="fas fa-truck fa-2x" style="color: var(--primary);"></i>
+                </div>
+                <h5 style="font-weight: 600;">Free Shipping</h5>
+                <p class="text-muted small">On orders over ₦50,000 nationwide</p>
+            </div>
+            <div class="col-md-3 col-sm-6" data-aos="fade-up" data-aos-delay="100">
+                <div style="width: 70px; height: 70px; background: rgba(198, 164, 63, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                    <i class="fas fa-shield-alt fa-2x" style="color: var(--primary);"></i>
+                </div>
+                <h5 style="font-weight: 600;">Quality Guarantee</h5>
+                <p class="text-muted small">Premium materials, built to last</p>
+            </div>
+            <div class="col-md-3 col-sm-6" data-aos="fade-up" data-aos-delay="200">
+                <div style="width: 70px; height: 70px; background: rgba(198, 164, 63, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                    <i class="fas fa-undo-alt fa-2x" style="color: var(--primary);"></i>
+                </div>
+                <h5 style="font-weight: 600;">Easy Returns</h5>
+                <p class="text-muted small">7-day return policy, no questions asked</p>
+            </div>
+            <div class="col-md-3 col-sm-6" data-aos="fade-up" data-aos-delay="300">
+                <div style="width: 70px; height: 70px; background: rgba(198, 164, 63, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                    <i class="fas fa-headset fa-2x" style="color: var(--primary);"></i>
+                </div>
+                <h5 style="font-weight: 600;">24/7 Support</h5>
+                <p class="text-muted small">Dedicated customer service team</p>
+            </div>
+        </div>
+    </div>
+</section>
+
 <!-- Newsletter Section -->
-<section style="background: linear-gradient(135deg, #E67E22, #D35400); padding: 60px 0;">
-    <div class="container text-center text-white">
-        <h2>Subscribe to Our Newsletter</h2>
-        <p class="mb-4">Get exclusive offers, recipes, and cooking tips straight to your inbox!</p>
+<section style="background: linear-gradient(135deg, var(--dark) 0%, #2D2D2D 100%); padding: 60px 0; position: relative; overflow: hidden;">
+    <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(198, 164, 63, 0.05); border-radius: 50%;"></div>
+    <div style="position: absolute; bottom: -50px; left: -50px; width: 200px; height: 200px; background: rgba(198, 164, 63, 0.05); border-radius: 50%;"></div>
+    <div class="container text-center text-white position-relative">
+        <h2 style="color: white; margin-bottom: 1rem;">Subscribe to Our Newsletter</h2>
+        <p style="color: rgba(255,255,255,0.7); margin-bottom: 2rem;">Get exclusive offers, recipes, and cooking tips straight to your inbox!</p>
         <form method="POST" action="/subscribe-newsletter" class="row justify-content-center">
             <div class="col-md-6">
-                <div class="input-group">
-                    <input type="email" name="email" class="form-control form-control-lg" placeholder="Your email address" required>
-                    <button class="btn btn-light btn-lg" style="color: #E67E22;" type="submit">Subscribe</button>
+                <div class="input-group" style="border-radius: 50px; overflow: hidden;">
+                    <input type="email" name="email" class="form-control" placeholder="Your email address" required style="border: none; padding: 0.9rem 1.5rem;">
+                    <button class="btn btn-primary-custom" type="submit" style="padding: 0.9rem 2rem;">
+                        Subscribe <i class="fas fa-paper-plane ms-2"></i>
+                    </button>
                 </div>
+                <p class="mt-3" style="font-size: 0.7rem; opacity: 0.6;">We respect your privacy. Unsubscribe at any time.</p>
             </div>
         </form>
     </div>
 </section>
 
 <style>
-    .hover-shadow { transition: all 0.3s; }
-    .hover-shadow:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important; }
+    .category-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--primary);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    }
+    
+    .product-card {
+        transition: all 0.3s ease;
+    }
+    
+    .product-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    @media (max-width: 768px) {
+        .hero-section {
+            padding: 60px 0;
+            text-align: center;
+            min-height: 70vh;
+        }
+        .hero-section .row .col-lg-7:first-child {
+            order: 2;
+        }
+        .hero-section .row .col-lg-5:last-child {
+            order: 1;
+            margin-bottom: 2rem;
+        }
+        .d-flex.gap-3 {
+            justify-content: center;
+        }
+        .row.mt-5.pt-3 {
+            justify-content: center;
+        }
+        .floating-cookware {
+            display: inline-block;
+        }
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-15px) rotate(5deg); }
+    }
+    
+    .floating-item {
+        animation: float 3s ease-in-out infinite;
+    }
 </style>
 {% endblock %}

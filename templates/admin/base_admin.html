@@ -1,0 +1,826 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Panel - Golden Kitchen Nigeria{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Admin Panel Container */
+.admin-wrapper {
+    display: flex;
+    min-height: calc(100vh - 70px);
+    position: relative;
+    background: #f5f7fb;
+}
+
+/* ========== SIDEBAR - REDESIGNED ========== */
+.admin-sidebar {
+    width: 260px;
+    background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+    color: #e2e8f0;
+    position: relative;
+    flex-shrink: 0;
+    min-height: calc(100vh - 70px);
+    overflow-y: auto;
+    transition: all 0.3s ease;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.08);
+    z-index: 10;
+}
+
+/* Custom Scrollbar */
+.admin-sidebar::-webkit-scrollbar {
+    width: 4px;
+}
+
+.admin-sidebar::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.admin-sidebar::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 4px;
+}
+
+/* Collapsed Sidebar */
+.admin-sidebar.collapsed {
+    width: 70px;
+}
+
+.admin-sidebar.collapsed .sidebar-text,
+.admin-sidebar.collapsed .badge-notification,
+.admin-sidebar.collapsed .sidebar-header h4,
+.admin-sidebar.collapsed .sidebar-header p,
+.admin-sidebar.collapsed .nav-section-title span {
+    display: none;
+}
+
+.admin-sidebar.collapsed .sidebar-header {
+    padding: 15px 0;
+}
+
+.admin-sidebar.collapsed .user-avatar {
+    width: 45px;
+    height: 45px;
+    font-size: 22px;
+    margin: 0 auto;
+}
+
+.admin-sidebar.collapsed .nav-link {
+    justify-content: center;
+    padding: 10px;
+}
+
+.admin-sidebar.collapsed .nav-link i {
+    margin-right: 0;
+    font-size: 1.2rem;
+}
+
+.admin-sidebar.collapsed .nav-section-title {
+    text-align: center;
+    padding: 8px 0;
+    font-size: 0.6rem;
+}
+
+/* Sidebar Header */
+.sidebar-header {
+    padding: 20px;
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    margin-bottom: 20px;
+}
+
+.user-avatar {
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 12px;
+    font-size: 32px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s;
+}
+
+.user-avatar:hover {
+    transform: scale(1.02);
+    border-color: var(--primary);
+}
+
+.sidebar-header h4 {
+    font-size: 0.9rem;
+    margin-bottom: 4px;
+    font-weight: 600;
+    color: white;
+}
+
+.sidebar-header p {
+    font-size: 0.7rem;
+    opacity: 0.6;
+    margin-bottom: 0;
+}
+
+/* Sidebar Navigation */
+.sidebar-nav {
+    padding: 0 12px 20px;
+}
+
+.nav-section {
+    margin-bottom: 20px;
+}
+
+.nav-section-title {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: rgba(255, 255, 255, 0.35);
+    padding: 6px 12px;
+    margin-bottom: 6px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.nav-section-title i {
+    font-size: 5px;
+}
+
+.sidebar-nav .nav-link {
+    color: rgba(255, 255, 255, 0.7);
+    padding: 10px 12px;
+    border-radius: 10px;
+    margin-bottom: 3px;
+    transition: all 0.25s ease;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    font-size: 0.85rem;
+}
+
+.sidebar-nav .nav-link i {
+    width: 20px;
+    font-size: 1rem;
+}
+
+.sidebar-nav .nav-link:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: white;
+}
+
+.sidebar-nav .nav-link.active {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    box-shadow: 0 2px 8px rgba(230, 126, 34, 0.25);
+}
+
+.badge-notification {
+    background: #ef4444;
+    color: white;
+    border-radius: 20px;
+    padding: 2px 7px;
+    font-size: 0.65rem;
+    margin-left: auto;
+    font-weight: 600;
+}
+
+/* Sidebar Toggle Button */
+.sidebar-toggle {
+    position: absolute;
+    right: -12px;
+    top: 30px;
+    background: white;
+    color: var(--primary);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 20;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-toggle:hover {
+    background: var(--primary);
+    color: white;
+    transform: scale(1.05);
+}
+
+/* ========== MAIN CONTENT ========== */
+.admin-content {
+    flex: 1;
+    padding: 20px 25px;
+    background: #f5f7fb;
+    min-height: calc(100vh - 70px);
+    overflow-x: auto;
+}
+
+/* Top Bar */
+.admin-topbar {
+    background: white;
+    padding: 12px 20px;
+    border-radius: 14px;
+    margin-bottom: 25px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    border: 1px solid #eef2f6;
+}
+
+.page-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--dark);
+    font-family: 'Cormorant Garamond', serif;
+}
+
+/* Stats Cards */
+.stat-card {
+    background: white;
+    border-radius: 16px;
+    padding: 18px;
+    transition: all 0.3s ease;
+    border: 1px solid #eef2f6;
+    height: 100%;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
+}
+
+.stat-icon {
+    width: 45px;
+    height: 45px;
+    background: rgba(198, 164, 63, 0.1);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    color: var(--primary);
+}
+
+.stat-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--dark);
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: var(--gray);
+    margin-bottom: 4px;
+    display: block;
+}
+
+/* Tables */
+.admin-table {
+    background: white;
+    border-radius: 14px;
+    overflow: hidden;
+    width: 100%;
+}
+
+.admin-table thead th {
+    background: #f8fafc;
+    padding: 12px 15px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    color: var(--dark);
+    border-bottom: 1px solid #eef2f6;
+}
+
+.admin-table tbody td {
+    padding: 10px 15px;
+    vertical-align: middle;
+    border-bottom-color: #f0f2f5;
+}
+
+/* Status Badges */
+.status-badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.status-completed {
+    background: #2D6A4F20;
+    color: #2D6A4F;
+}
+
+.status-pending {
+    background: #F39C1220;
+    color: #F39C12;
+}
+
+.status-active {
+    background: #3498DB20;
+    color: #3498DB;
+}
+
+.status-cancelled {
+    background: #E74C3C20;
+    color: #E74C3C;
+}
+
+/* Buttons */
+.btn-admin-primary {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    border: none;
+    color: white;
+    padding: 7px 18px;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 0.85rem;
+    transition: all 0.3s;
+}
+
+.btn-admin-primary:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(230, 126, 34, 0.3);
+    color: white;
+}
+
+.btn-admin-outline {
+    border: 1px solid var(--primary);
+    color: var(--primary);
+    background: transparent;
+    padding: 7px 18px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    transition: all 0.3s;
+}
+
+.btn-admin-outline:hover {
+    background: var(--primary);
+    color: white;
+}
+
+/* Search Box */
+.search-box {
+    position: relative;
+}
+
+.search-box input {
+    padding-left: 32px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    font-size: 0.85rem;
+}
+
+.search-box input:focus {
+    border-color: var(--primary);
+    box-shadow: none;
+}
+
+.search-box i {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    font-size: 0.85rem;
+    z-index: 1;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .admin-sidebar {
+        position: fixed;
+        left: -260px;
+        top: 0;
+        bottom: 0;
+        z-index: 1000;
+        min-height: 100vh;
+    }
+    
+    .admin-sidebar.mobile-open {
+        left: 0;
+    }
+    
+    .admin-content {
+        padding: 15px;
+    }
+    
+    .sidebar-toggle {
+        display: none;
+    }
+    
+    .mobile-menu-btn {
+        display: block;
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 8px 12px;
+    }
+    
+    .admin-topbar {
+        padding: 12px 15px;
+    }
+    
+    .page-title {
+        font-size: 1.1rem;
+    }
+    
+    .stat-value {
+        font-size: 20px;
+    }
+    
+    .stat-icon {
+        width: 38px;
+        height: 38px;
+        font-size: 18px;
+    }
+}
+
+@media (min-width: 769px) {
+    .mobile-menu-btn {
+        display: none;
+    }
+}
+
+/* Mobile Menu Button */
+.mobile-menu-btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+}
+
+.mobile-menu-btn:hover {
+    background: var(--primary-dark);
+}
+
+/* Mobile Overlay */
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    display: none;
+}
+
+.sidebar-overlay.active {
+    display: block;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease;
+}
+
+/* Alert Styling */
+.alert-info {
+    background: #e0f2fe;
+    border: none;
+    color: #0369a1;
+    border-radius: 12px;
+    padding: 15px 20px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-wrapper">
+    <!-- Mobile Menu Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileSidebar()"></div>
+    
+    <!-- Sidebar -->
+    <div class="admin-sidebar" id="adminSidebar">
+        <!-- Sidebar Toggle Button (Desktop) -->
+        <button class="sidebar-toggle" id="sidebarToggle">
+            <i class="fas fa-chevron-left" id="toggleIcon"></i>
+        </button>
+        
+        <div class="sidebar-header">
+            <div class="user-avatar">
+                <i class="fas fa-crown"></i>
+            </div>
+            <h4>{{ session.user_name if session.user_name else 'Admin User' }}</h4>
+            <p><i class="fas fa-shield-alt me-1"></i> Administrator</p>
+        </div>
+        
+        <div class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">
+                    <i class="fas fa-circle"></i>
+                    <span>MAIN</span>
+                </div>
+                <a class="nav-link {% if request.endpoint == 'admin_dashboard' %}active{% endif %}" href="{{ url_for('admin_dashboard') }}">
+                    <i class="fas fa-chart-line"></i>
+                    <span class="sidebar-text">Dashboard</span>
+                </a>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-section-title">
+                    <i class="fas fa-circle"></i>
+                    <span>STORE</span>
+                </div>
+                <a class="nav-link {% if request.endpoint == 'admin_products' %}active{% endif %}" href="{{ url_for('admin_products') }}">
+                    <i class="fas fa-box"></i>
+                    <span class="sidebar-text">Products</span>
+                </a>
+                <a class="nav-link {% if request.endpoint == 'admin_orders' %}active{% endif %}" href="{{ url_for('admin_orders') }}">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="sidebar-text">Orders</span>
+                    <span class="badge-notification" id="pendingOrdersBadge" style="display: none;">0</span>
+                </a>
+                <a class="nav-link {% if request.endpoint == 'admin_customers' %}active{% endif %}" href="{{ url_for('admin_customers') }}">
+                    <i class="fas fa-users"></i>
+                    <span class="sidebar-text">Customers</span>
+                </a>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-section-title">
+                    <i class="fas fa-circle"></i>
+                    <span>MARKETING</span>
+                </div>
+                <a class="nav-link {% if request.endpoint == 'admin_coupons' %}active{% endif %}" href="{{ url_for('admin_coupons') }}">
+                    <i class="fas fa-ticket-alt"></i>
+                    <span class="sidebar-text">Coupons</span>
+                </a>
+                <a class="nav-link {% if request.endpoint == 'admin_reviews' %}active{% endif %}" href="{{ url_for('admin_reviews') }}">
+                    <i class="fas fa-star"></i>
+                    <span class="sidebar-text">Reviews</span>
+                </a>
+                <a class="nav-link {% if request.endpoint == 'admin_newsletter' %}active{% endif %}" href="{{ url_for('admin_newsletter') }}">
+                    <i class="fas fa-envelope"></i>
+                    <span class="sidebar-text">Newsletter</span>
+                    <span class="badge-notification" id="subscribersBadge" style="display: none;">0</span>
+                </a>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-section-title">
+                    <i class="fas fa-circle"></i>
+                    <span>REPORTS</span>
+                </div>
+                <a class="nav-link {% if request.endpoint == 'admin_reports' %}active{% endif %}" href="{{ url_for('admin_reports') }}">
+                    <i class="fas fa-file-alt"></i>
+                    <span class="sidebar-text">Analytics</span>
+                </a>
+                <a class="nav-link {% if request.endpoint == 'bulk_import' %}active{% endif %}" href="{{ url_for('bulk_import') }}">
+                    <i class="fas fa-upload"></i>
+                    <span class="sidebar-text">Bulk Import</span>
+                </a>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-section-title">
+                    <i class="fas fa-circle"></i>
+                    <span>ACCOUNT</span>
+                </div>
+                <a class="nav-link" href="/profile">
+                    <i class="fas fa-user-cog"></i>
+                    <span class="sidebar-text">Profile Settings</span>
+                </a>
+                <a class="nav-link" href="{{ url_for('logout') }}">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span class="sidebar-text">Logout</span>
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="admin-content">
+        <div class="admin-topbar">
+            <div class="d-flex align-items-center gap-3">
+                <button class="mobile-menu-btn" id="mobileMenuBtn" onclick="openMobileSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h2 class="page-title">
+                    {% block page_title %}
+                    <i class="fas fa-chart-pie me-2" style="color: var(--primary);"></i>Dashboard
+                    {% endblock %}
+                </h2>
+            </div>
+            <div class="d-flex gap-3 align-items-center">
+                <!-- Search Box -->
+                <div class="search-box d-none d-md-block">
+                    <i class="fas fa-search"></i>
+                    <input type="text" class="form-control form-control-sm" placeholder="Search..." style="width: 180px;" id="globalSearch">
+                </div>
+                
+                <!-- Notification Bell -->
+                <div class="dropdown">
+                    <button class="btn btn-light position-relative" data-bs-toggle="dropdown" style="border-radius: 50%; width: 38px; height: 38px; padding: 0; background: #f1f5f9; border: none;">
+                        <i class="fas fa-bell" style="color: var(--gray);"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="notificationBadge" style="font-size: 9px; display: none;">0</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end p-0" style="width: 300px;">
+                        <li class="p-3 border-bottom">
+                            <strong><i class="fas fa-bell me-2"></i>Notifications</strong>
+                        </li>
+                        <li id="notificationList">
+                            <div class="text-center py-3 text-muted small">Loading notifications...</div>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Admin Dropdown -->
+                <div class="dropdown">
+                    <button class="btn btn-admin-primary dropdown-toggle" data-bs-toggle="dropdown">
+                        <i class="fas fa-user-shield me-1"></i> {{ session.user_name if session.user_name else 'Admin' }}
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="/profile"><i class="fas fa-user me-2"></i>My Profile</a></li>
+                        <li><a class="dropdown-item" href="/admin/settings"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Stats Cards Container -->
+        <div class="row g-4 mb-4" id="statsContainer">
+            {% block stats_cards %}{% endblock %}
+        </div>
+        
+        <!-- Main Admin Content -->
+        {% block admin_content %}
+        <div class="text-center py-5">
+            <div class="alert alert-info rounded-4">
+                <i class="fas fa-info-circle me-2"></i>
+                Welcome to the Admin Panel. Select a section from the sidebar to manage your store.
+            </div>
+        </div>
+        {% endblock %}
+    </div>
+</div>
+
+<script>
+// Sidebar Toggle (Desktop)
+const sidebarToggle = document.getElementById('sidebarToggle');
+if (sidebarToggle) {
+    sidebarToggle.addEventListener('click', function() {
+        const sidebar = document.getElementById('adminSidebar');
+        const icon = document.getElementById('toggleIcon');
+        sidebar.classList.toggle('collapsed');
+        
+        if (sidebar.classList.contains('collapsed')) {
+            icon.classList.remove('fa-chevron-left');
+            icon.classList.add('fa-chevron-right');
+            localStorage.setItem('adminSidebarCollapsed', 'true');
+        } else {
+            icon.classList.remove('fa-chevron-right');
+            icon.classList.add('fa-chevron-left');
+            localStorage.setItem('adminSidebarCollapsed', 'false');
+        }
+    });
+}
+
+// Load sidebar state from localStorage
+document.addEventListener('DOMContentLoaded', function() {
+    const isCollapsed = localStorage.getItem('adminSidebarCollapsed') === 'true';
+    if (isCollapsed) {
+        const sidebar = document.getElementById('adminSidebar');
+        const icon = document.getElementById('toggleIcon');
+        if (sidebar && icon) {
+            sidebar.classList.add('collapsed');
+            icon.classList.remove('fa-chevron-left');
+            icon.classList.add('fa-chevron-right');
+        }
+    }
+    
+    // Fetch counts
+    fetchPendingOrdersCount();
+    fetchSubscribersCount();
+    fetchNotifications();
+    
+    // Global search functionality
+    const searchInput = document.getElementById('globalSearch');
+    if (searchInput) {
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const query = this.value.trim();
+                if (query) {
+                    window.location.href = `/admin/search?q=${encodeURIComponent(query)}`;
+                }
+            }
+        });
+    }
+});
+
+function closeMobileSidebar() {
+    const sidebar = document.getElementById('adminSidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    if (sidebar) sidebar.classList.remove('mobile-open');
+    if (overlay) overlay.classList.remove('active');
+}
+
+function openMobileSidebar() {
+    const sidebar = document.getElementById('adminSidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    if (sidebar) sidebar.classList.add('mobile-open');
+    if (overlay) overlay.classList.add('active');
+}
+
+function fetchPendingOrdersCount() {
+    fetch('/admin/api/pending-orders-count')
+        .then(response => response.json())
+        .then(data => {
+            const badge = document.getElementById('pendingOrdersBadge');
+            if (badge && data.count > 0) {
+                badge.textContent = data.count;
+                badge.style.display = 'inline-block';
+            } else if (badge) {
+                badge.style.display = 'none';
+            }
+        })
+        .catch(error => console.error('Error fetching orders count:', error));
+}
+
+function fetchSubscribersCount() {
+    fetch('/admin/api/subscribers-count')
+        .then(response => response.json())
+        .then(data => {
+            const badge = document.getElementById('subscribersBadge');
+            if (badge && data.count > 0) {
+                badge.textContent = data.count;
+                badge.style.display = 'inline-block';
+            } else if (badge) {
+                badge.style.display = 'none';
+            }
+        })
+        .catch(error => console.error('Error fetching subscribers count:', error));
+}
+
+function fetchNotifications() {
+    fetch('/admin/api/notifications')
+        .then(response => response.json())
+        .then(data => {
+            const notificationList = document.getElementById('notificationList');
+            const badge = document.getElementById('notificationBadge');
+            
+            if (data.notifications && data.notifications.length > 0) {
+                if (badge) {
+                    badge.textContent = data.notifications.length;
+                    badge.style.display = 'inline-block';
+                }
+                
+                let html = '';
+                data.notifications.forEach(notif => {
+                    html += `
+                        <li class="p-3 border-bottom">
+                            <small class="text-muted">${notif.icon || '🔔'} ${notif.message}</small>
+                            <br><small class="text-muted" style="font-size: 0.65rem;">${notif.time || 'Just now'}</small>
+                        </li>
+                    `;
+                });
+                if (notificationList) notificationList.innerHTML = html;
+            } else {
+                if (notificationList) notificationList.innerHTML = '<div class="text-center py-3 text-muted small">No new notifications</div>';
+                if (badge) badge.style.display = 'none';
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching notifications:', error);
+            const notificationList = document.getElementById('notificationList');
+            if (notificationList) {
+                notificationList.innerHTML = '<div class="text-center py-3 text-muted small">Unable to load notifications</div>';
+            }
+        });
+}
+
+// Auto-refresh notifications every 30 seconds
+setInterval(() => {
+    fetchPendingOrdersCount();
+    fetchSubscribersCount();
+    fetchNotifications();
+}, 30000);
+</script>
+{% endblock %}

@@ -1,73 +1,333 @@
 {% extends "base.html" %}
 
+{% block title %}FAQ - Golden Kitchen Nigeria{% endblock %}
+
 {% block content %}
+<!-- FAQ Hero Section -->
+<section style="background: linear-gradient(135deg, var(--gray-light) 0%, white 100%); padding: 60px 0 40px;">
+    <div class="container text-center">
+        <h1 class="display-4 fw-bold" style="font-family: 'Cormorant Garamond', serif;">
+            <i class="fas fa-question-circle me-3" style="color: var(--primary);"></i>Frequently Asked Questions
+        </h1>
+        <p class="lead text-muted">Find answers to common questions about our products and services</p>
+        <div class="search-box mt-4" style="max-width: 500px; margin: 0 auto;">
+            <div class="input-group">
+                <span class="input-group-text" style="background: white; border-right: none;">
+                    <i class="fas fa-search" style="color: var(--primary);"></i>
+                </span>
+                <input type="text" id="faqSearch" class="form-control" placeholder="Search your question..." style="border-left: none;">
+            </div>
+        </div>
+    </div>
+</section>
+
 <div class="container my-5">
-    <h1 class="text-center mb-5">Frequently Asked Questions</h1>
     <div class="row">
-        <div class="col-md-8 mx-auto">
+        <div class="col-lg-8 mx-auto">
+            <!-- Category Tabs -->
+            <ul class="nav nav-pills justify-content-center mb-5" id="faqTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" data-category="all" onclick="filterFaqs('all')" style="border-radius: 30px; margin: 0 5px;">
+                        <i class="fas fa-list me-2"></i>All
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-category="shipping" onclick="filterFaqs('shipping')" style="border-radius: 30px; margin: 0 5px;">
+                        <i class="fas fa-truck me-2"></i>Shipping
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-category="payment" onclick="filterFaqs('payment')" style="border-radius: 30px; margin: 0 5px;">
+                        <i class="fas fa-credit-card me-2"></i>Payment
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-category="returns" onclick="filterFaqs('returns')" style="border-radius: 30px; margin: 0 5px;">
+                        <i class="fas fa-undo-alt me-2"></i>Returns
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-category="product" onclick="filterFaqs('product')" style="border-radius: 30px; margin: 0 5px;">
+                        <i class="fas fa-box me-2"></i>Products
+                    </button>
+                </li>
+            </ul>
+            
+            <!-- FAQ Accordion -->
             <div class="accordion" id="faqAccordion">
-                <div class="accordion-item">
-                    <h2 class="accordion-header">
-                        <button class="accordion-button" data-bs-toggle="collapse" data-bs-target="#q1">
-                            How long does shipping take?
-                        </button>
-                    </h2>
-                    <div id="q1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
-                        <div class="accordion-body">
-                            Delivery takes 2-5 business days within Nigeria. Lagos and major cities typically receive delivery within 2-3 days.
+                <!-- Shipping Category -->
+                <div class="faq-item" data-category="shipping">
+                    <div class="accordion-item mb-3 border-0 shadow-sm rounded-3 overflow-hidden">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q1" style="background: white; padding: 20px;">
+                                <div class="d-flex align-items-center gap-3">
+                                    <i class="fas fa-truck fa-lg" style="color: var(--primary);"></i>
+                                    <span class="fw-semibold">How long does shipping take?</span>
+                                </div>
+                            </button>
+                        </h2>
+                        <div id="q1" class="accordion-collapse collapse">
+                            <div class="accordion-body" style="background: var(--gray-light); padding: 20px;">
+                                <p class="mb-0">Delivery takes 2-5 business days within Nigeria. Lagos and major cities typically receive delivery within 2-3 days. Remote areas may take 5-7 business days.</p>
+                                <div class="mt-3">
+                                    <small class="text-muted"><i class="fas fa-clock me-1"></i> Cut-off time: 2 PM for same-day dispatch</small>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="accordion-item">
-                    <h2 class="accordion-header">
-                        <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q2">
-                            What payment methods do you accept?
-                        </button>
-                    </h2>
-                    <div id="q2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                        <div class="accordion-body">
-                            We accept Cash on Delivery, Bank Transfer, and Card Payments (Verve, Mastercard, Visa).
+                
+                <div class="faq-item" data-category="shipping">
+                    <div class="accordion-item mb-3 border-0 shadow-sm rounded-3 overflow-hidden">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q2" style="background: white; padding: 20px;">
+                                <div class="d-flex align-items-center gap-3">
+                                    <i class="fas fa-map-marker-alt fa-lg" style="color: var(--primary);"></i>
+                                    <span class="fw-semibold">Do you deliver to all states in Nigeria?</span>
+                                </div>
+                            </button>
+                        </h2>
+                        <div id="q2" class="accordion-collapse collapse">
+                            <div class="accordion-body" style="background: var(--gray-light); padding: 20px;">
+                                <p class="mb-0">Yes! We deliver to all 36 states in Nigeria, including Abuja FCT. We have partnered with reliable logistics companies to ensure nationwide coverage.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="accordion-item">
-                    <h2 class="accordion-header">
-                        <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q3">
-                            Do you deliver to all states in Nigeria?
-                        </button>
-                    </h2>
-                    <div id="q3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                        <div class="accordion-body">
-                            Yes! We deliver to all 36 states in Nigeria, including Abuja FCT.
+                
+                <div class="faq-item" data-category="shipping">
+                    <div class="accordion-item mb-3 border-0 shadow-sm rounded-3 overflow-hidden">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q3" style="background: white; padding: 20px;">
+                                <div class="d-flex align-items-center gap-3">
+                                    <i class="fas fa-search-location fa-lg" style="color: var(--primary);"></i>
+                                    <span class="fw-semibold">How can I track my order?</span>
+                                </div>
+                            </button>
+                        </h2>
+                        <div id="q3" class="accordion-collapse collapse">
+                            <div class="accordion-body" style="background: var(--gray-light); padding: 20px;">
+                                <p>After your order ships, you'll receive a tracking number via email and WhatsApp. You can also track your order in the "My Orders" section of your account.</p>
+                                <a href="/orders" class="btn btn-sm btn-outline-custom mt-2">Track My Order</a>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="accordion-item">
-                    <h2 class="accordion-header">
-                        <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q4">
-                            What is your return policy?
-                        </button>
-                    </h2>
-                    <div id="q4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                        <div class="accordion-body">
-                            We offer a 7-day return policy for unused items in original packaging. Contact our support team to initiate a return.
+                
+                <!-- Payment Category -->
+                <div class="faq-item" data-category="payment">
+                    <div class="accordion-item mb-3 border-0 shadow-sm rounded-3 overflow-hidden">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q4" style="background: white; padding: 20px;">
+                                <div class="d-flex align-items-center gap-3">
+                                    <i class="fas fa-credit-card fa-lg" style="color: var(--primary);"></i>
+                                    <span class="fw-semibold">What payment methods do you accept?</span>
+                                </div>
+                            </button>
+                        </h2>
+                        <div id="q4" class="accordion-collapse collapse">
+                            <div class="accordion-body" style="background: var(--gray-light); padding: 20px;">
+                                <p class="mb-0">We accept multiple payment methods:</p>
+                                <ul class="mt-2">
+                                    <li>💵 Cash on Delivery</li>
+                                    <li>🏦 Bank Transfer</li>
+                                    <li>💳 Card Payments (Verve, Mastercard, Visa)</li>
+                                    <li>📱 USSD Transfer</li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="accordion-item">
-                    <h2 class="accordion-header">
-                        <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q5">
-                            How can I track my order?
-                        </button>
-                    </h2>
-                    <div id="q5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                        <div class="accordion-body">
-                            After your order ships, you'll receive a tracking number via email or WhatsApp.
+                
+                <div class="faq-item" data-category="payment">
+                    <div class="accordion-item mb-3 border-0 shadow-sm rounded-3 overflow-hidden">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q5" style="background: white; padding: 20px;">
+                                <div class="d-flex align-items-center gap-3">
+                                    <i class="fas fa-ticket-alt fa-lg" style="color: var(--primary);"></i>
+                                    <span class="fw-semibold">Do you offer discounts or coupons?</span>
+                                </div>
+                            </button>
+                        </h2>
+                        <div id="q5" class="accordion-collapse collapse">
+                            <div class="accordion-body" style="background: var(--gray-light); padding: 20px;">
+                                <p>Yes! We regularly offer discounts and coupon codes. Current offers:</p>
+                                <ul>
+                                    <li><strong>WELCOME10</strong> - 10% off your first order</li>
+                                    <li><strong>SAVE20</strong> - ₦20,000 off on orders over ₦100,000</li>
+                                </ul>
+                                <p>Subscribe to our newsletter for exclusive deals!</p>
+                            </div>
                         </div>
                     </div>
+                </div>
+                
+                <!-- Returns Category -->
+                <div class="faq-item" data-category="returns">
+                    <div class="accordion-item mb-3 border-0 shadow-sm rounded-3 overflow-hidden">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q6" style="background: white; padding: 20px;">
+                                <div class="d-flex align-items-center gap-3">
+                                    <i class="fas fa-undo-alt fa-lg" style="color: var(--primary);"></i>
+                                    <span class="fw-semibold">What is your return policy?</span>
+                                </div>
+                            </button>
+                        </h2>
+                        <div id="q6" class="accordion-collapse collapse">
+                            <div class="accordion-body" style="background: var(--gray-light); padding: 20px;">
+                                <p>We offer a 7-day return policy for unused items in original packaging. To initiate a return:</p>
+                                <ol>
+                                    <li>Contact our support team within 7 days of delivery</li>
+                                    <li>Provide your order number and reason for return</li>
+                                    <li>Pack the item securely in original packaging</li>
+                                </ol>
+                                <p>Refunds are processed within 3-5 business days after inspection.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Products Category -->
+                <div class="faq-item" data-category="product">
+                    <div class="accordion-item mb-3 border-0 shadow-sm rounded-3 overflow-hidden">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q7" style="background: white; padding: 20px;">
+                                <div class="d-flex align-items-center gap-3">
+                                    <i class="fas fa-shield-alt fa-lg" style="color: var(--primary);"></i>
+                                    <span class="fw-semibold">Are your products authentic and high quality?</span>
+                                </div>
+                            </button>
+                        </h2>
+                        <div id="q7" class="accordion-collapse collapse">
+                            <div class="accordion-body" style="background: var(--gray-light); padding: 20px;">
+                                <p>Absolutely! We source our products from reputable manufacturers worldwide. All our products are:</p>
+                                <ul>
+                                    <li>✓ 100% authentic</li>
+                                    <li>✓ Quality tested</li>
+                                    <li>✓ Covered by manufacturer warranty</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="faq-item" data-category="product">
+                    <div class="accordion-item mb-3 border-0 shadow-sm rounded-3 overflow-hidden">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#q8" style="background: white; padding: 20px;">
+                                <div class="d-flex align-items-center gap-3">
+                                    <i class="fas fa-certificate fa-lg" style="color: var(--primary);"></i>
+                                    <span class="fw-semibold">Do your products come with warranty?</span>
+                                </div>
+                            </button>
+                        </h2>
+                        <div id="q8" class="accordion-collapse collapse">
+                            <div class="accordion-body" style="background: var(--gray-light); padding: 20px;">
+                                <p>Yes! Most of our products come with a 1-year manufacturer warranty against manufacturing defects. Premium items have extended 5-year warranty. Check the product page for specific warranty details.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- No Results Message -->
+            <div id="noResults" class="text-center py-5" style="display: none;">
+                <i class="fas fa-search fa-4x text-muted mb-3"></i>
+                <h4>No matching questions found</h4>
+                <p class="text-muted">Try searching with different keywords</p>
+                <button class="btn btn-outline-custom" onclick="resetSearch()">Clear Search</button>
+            </div>
+            
+            <!-- Still Have Questions -->
+            <div class="text-center mt-5 p-5 rounded-4" style="background: linear-gradient(135deg, var(--gray-light), white); border: 1px solid var(--border);">
+                <i class="fas fa-headset fa-3x" style="color: var(--primary); margin-bottom: 15px;"></i>
+                <h4>Still Have Questions?</h4>
+                <p class="text-muted">Our support team is here to help you</p>
+                <div class="d-flex gap-3 justify-content-center mt-3">
+                    <a href="/contact" class="btn btn-primary-custom">
+                        <i class="fas fa-envelope me-2"></i>Contact Us
+                    </a>
+                    <a href="https://wa.me/2348123456789" class="btn btn-outline-custom">
+                        <i class="fab fa-whatsapp me-2"></i>WhatsApp
+                    </a>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    .accordion-button:focus {
+        box-shadow: none;
+        border-color: var(--primary);
+    }
+    
+    .accordion-button:not(.collapsed) {
+        background: white;
+        color: var(--primary);
+    }
+    
+    .accordion-button:not(.collapsed)::after {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23C6A43F'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+    }
+    
+    .nav-pills .nav-link.active {
+        background: var(--primary);
+    }
+    
+    .faq-item {
+        transition: all 0.2s;
+    }
+</style>
+
+<script>
+function filterFaqs(category) {
+    // Update active tab
+    document.querySelectorAll('.nav-link').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    document.querySelector(`[data-category="${category}"]`).classList.add('active');
+    
+    // Filter FAQs
+    const faqItems = document.querySelectorAll('.faq-item');
+    let visibleCount = 0;
+    
+    faqItems.forEach(item => {
+        if (category === 'all' || item.dataset.category === category) {
+            item.style.display = 'block';
+            visibleCount++;
+        } else {
+            item.style.display = 'none';
+        }
+    });
+    
+    document.getElementById('noResults').style.display = visibleCount === 0 ? 'block' : 'none';
+}
+
+// Search functionality
+document.getElementById('faqSearch').addEventListener('input', function() {
+    const searchTerm = this.value.toLowerCase();
+    const faqItems = document.querySelectorAll('.faq-item');
+    let visibleCount = 0;
+    
+    faqItems.forEach(item => {
+        const question = item.querySelector('.accordion-button span span').innerText.toLowerCase();
+        const answer = item.querySelector('.accordion-body').innerText.toLowerCase();
+        
+        if (question.includes(searchTerm) || answer.includes(searchTerm)) {
+            item.style.display = 'block';
+            visibleCount++;
+        } else {
+            item.style.display = 'none';
+        }
+    });
+    
+    document.getElementById('noResults').style.display = visibleCount === 0 && searchTerm.length > 0 ? 'block' : 'none';
+});
+
+function resetSearch() {
+    document.getElementById('faqSearch').value = '';
+    filterFaqs('all');
+}
+</script>
 {% endblock %}

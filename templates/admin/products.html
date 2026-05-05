@@ -1,68 +1,114 @@
-{% extends "base.html" %}
+{% extends "admin/base_admin.html" %}
 
 {% block title %}Manage Products - Admin{% endblock %}
 
-{% block content %}
-<div class="container-fluid py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Manage Products</h1>
-        <div>
-            <a href="/admin/export-products" class="btn btn-outline-terracotta me-2">
-                <i class="fas fa-download"></i> Export CSV
+{% block page_title %}
+<i class="fas fa-box me-2" style="color: var(--primary);"></i>Manage Products
+{% endblock %}
+
+{% block admin_content %}
+<div class="products-management">
+    <!-- Action Buttons Bar -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+        <div class="d-flex gap-2">
+            <div class="dropdown">
+                <button class="btn btn-admin-outline dropdown-toggle" data-bs-toggle="dropdown">
+                    <i class="fas fa-filter me-1"></i>Filter
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="?category=all">All Products</a></li>
+                    <li><a class="dropdown-item" href="?category=featured">Featured</a></li>
+                    <li><a class="dropdown-item" href="?category=bestseller">Best Sellers</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="?stock=low">Low Stock (< 10)</a></li>
+                    <li><a class="dropdown-item" href="?stock=out">Out of Stock</a></li>
+                </ul>
+            </div>
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" class="form-control" placeholder="Search products..." id="searchInput" style="width: 250px;">
+            </div>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="/admin/export-products" class="btn btn-admin-outline">
+                <i class="fas fa-download me-1"></i> Export CSV
             </a>
-            <a href="/admin/products/add" class="btn btn-terracotta">
-                <i class="fas fa-plus"></i> Add Product
+            <a href="/admin/products/add" class="btn btn-admin-primary">
+                <i class="fas fa-plus me-1"></i> Add Product
             </a>
         </div>
     </div>
     
-    <div class="card border-0 shadow-sm">
+    <!-- Products Table -->
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-hover mb-0">
-                    <thead class="table-light">
+                <table class="table admin-table mb-0" id="productsTable">
+                    <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Image</th>
+                            <th style="width: 50px;">ID</th>
+                            <th style="width: 60px;">Image</th>
                             <th>Name</th>
                             <th>Category</th>
                             <th>Price</th>
                             <th>Stock</th>
                             <th>Status</th>
-                            <th>Actions</th>
+                            <th style="width: 100px;">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for product in products %}
-                        <tr>
+                        <tr data-name="{{ product.name.lower() }}" data-category="{{ product.category.lower() }}">
                             <td>{{ product.id }}</td>
                             <td>
-                                <i class="fas fa-{{ product.image }} fa-2x" style="color: #E67E22;"></i>
-                            </td>
-                            <td><strong>{{ product.name }}</strong></td>
-                            <td>{{ product.category }}</td>
-                            <td>₦{{ "{:,.0f}".format(product.price) }}</td>
-                            <td class="{% if product.stock < 10 %}text-danger fw-bold{% endif %}">
-                                {{ product.stock }}
+                                <div class="product-icon-wrapper">
+                                    <i class="fas fa-{{ product.image|default('box') }} fa-lg" style="color: var(--primary);"></i>
+                                </div>
                             </td>
                             <td>
-                                {% if product.featured %}
-                                    <span class="badge bg-info">Featured</span>
-                                {% endif %}
-                                {% if product.bestseller %}
-                                    <span class="badge bg-warning">Best Seller</span>
-                                {% endif %}
-                             </td>
+                                <div class="d-flex flex-column">
+                                    <strong>{{ product.name }}</strong>
+                                    <small class="text-muted">SKU: {{ product.sku|default('N/A') }}</small>
+                                </div>
+                            </td>
                             <td>
-                                <a href="/admin/products/edit/{{ product.id }}" class="btn btn-sm btn-warning">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <form method="POST" action="/admin/products/delete/{{ product.id }}" style="display:inline" 
-                                      onsubmit="return confirm('Delete this product?')">
-                                    <button class="btn btn-sm btn-danger">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </form>
+                                <span class="category-badge">{{ product.category }}</span>
+                            </td>
+                            <td class="fw-semibold" style="color: var(--primary);">₦{{ "{:,.0f}".format(product.price) }}</td>
+                            <td>
+                                {% if product.stock <= 0 %}
+                                    <span class="stock-badge out">Out of Stock</span>
+                                {% elif product.stock < 10 %}
+                                    <span class="stock-badge low">{{ product.stock }} left</span>
+                                {% else %}
+                                    <span class="stock-badge good">{{ product.stock }} in stock</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="d-flex gap-1 flex-wrap">
+                                    {% if product.featured %}
+                                        <span class="status-badge featured">Featured</span>
+                                    {% endif %}
+                                    {% if product.bestseller %}
+                                        <span class="status-badge bestseller">Best Seller</span>
+                                    {% endif %}
+                                    {% if not product.featured and not product.bestseller %}
+                                        <span class="text-muted small">—</span>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex gap-1">
+                                    <a href="/admin/products/edit/{{ product.id }}" class="btn btn-sm btn-action edit" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form method="POST" action="/admin/products/delete/{{ product.id }}" style="display:inline" 
+                                          onsubmit="return confirm('⚠️ Are you sure you want to delete "{{ product.name }}"? This action cannot be undone.')">
+                                        <button class="btn btn-sm btn-action delete" title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
                              </td>
                         </tr>
                         {% endfor %}
@@ -71,5 +117,425 @@
             </div>
         </div>
     </div>
+    
+    <!-- Pagination -->
+    {% if products|length > 10 %}
+    <div class="d-flex justify-content-between align-items-center mt-4">
+        <div class="text-muted small">
+            Showing <span id="showingStart">1</span> to <span id="showingEnd">10</span> of <span id="totalCount">{{ products|length }}</span> products
+        </div>
+        <nav>
+            <ul class="pagination mb-0" id="pagination">
+                <li class="page-item disabled"><a class="page-link" href="#" id="prevPage"><i class="fas fa-chevron-left"></i></a></li>
+                <li class="page-item active"><a class="page-link" href="#" data-page="1">1</a></li>
+                <li class="page-item"><a class="page-link" href="#" id="nextPage"><i class="fas fa-chevron-right"></i></a></li>
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+    
+    <!-- Quick Stats -->
+    <div class="row g-3 mt-4">
+        <div class="col-md-3">
+            <div class="quick-stat">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="stat-label">Total Products</span>
+                        <h4 class="mb-0">{{ products|length }}</h4>
+                    </div>
+                    <i class="fas fa-box fa-2x" style="color: var(--primary); opacity: 0.5;"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="quick-stat">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="stat-label">Low Stock Items</span>
+                        <h4 class="mb-0 text-warning">{{ products|selectattr('stock', 'lessthan', 10)|list|length }}</h4>
+                    </div>
+                    <i class="fas fa-exclamation-triangle fa-2x" style="color: #f59e0b; opacity: 0.5;"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="quick-stat">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="stat-label">Out of Stock</span>
+                        <h4 class="mb-0 text-danger">{{ products|selectattr('stock', 'equalto', 0)|list|length }}</h4>
+                    </div>
+                    <i class="fas fa-times-circle fa-2x" style="color: #ef4444; opacity: 0.5;"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="quick-stat">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="stat-label">Categories</span>
+                        <h4 class="mb-0">{{ products|map(attribute='category')|unique|list|length }}</h4>
+                    </div>
+                    <i class="fas fa-tags fa-2x" style="color: var(--primary); opacity: 0.5;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<style>
+.products-management {
+    animation: fadeIn 0.3s ease;
+}
+
+/* Search Box */
+.search-box {
+    position: relative;
+}
+
+.search-box i {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    font-size: 0.85rem;
+    z-index: 1;
+}
+
+.search-box input {
+    padding-left: 35px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    font-size: 0.85rem;
+    width: 250px;
+}
+
+.search-box input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(198, 164, 63, 0.1);
+}
+
+/* Product Icon */
+.product-icon-wrapper {
+    width: 40px;
+    height: 40px;
+    background: rgba(198, 164, 63, 0.1);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Category Badge */
+.category-badge {
+    background: #f1f5f9;
+    color: #475569;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+/* Stock Badges */
+.stock-badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.stock-badge.good {
+    background: #2D6A4F20;
+    color: #2D6A4F;
+}
+
+.stock-badge.low {
+    background: #f59e0b20;
+    color: #f59e0b;
+}
+
+.stock-badge.out {
+    background: #ef444420;
+    color: #ef4444;
+}
+
+/* Status Badges */
+.status-badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.status-badge.featured {
+    background: #3b82f620;
+    color: #3b82f6;
+}
+
+.status-badge.bestseller {
+    background: #f59e0b20;
+    color: #f59e0b;
+}
+
+/* Action Buttons */
+.btn-action {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.btn-action.edit {
+    background: #3b82f620;
+    color: #3b82f6;
+    border: none;
+}
+
+.btn-action.edit:hover {
+    background: #3b82f6;
+    color: white;
+    transform: translateY(-1px);
+}
+
+.btn-action.delete {
+    background: #ef444420;
+    color: #ef4444;
+    border: none;
+}
+
+.btn-action.delete:hover {
+    background: #ef4444;
+    color: white;
+    transform: translateY(-1px);
+}
+
+/* Quick Stats Cards */
+.quick-stat {
+    background: white;
+    border-radius: 16px;
+    padding: 16px 20px;
+    border: 1px solid #eef2f6;
+    transition: all 0.2s;
+}
+
+.quick-stat:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* Pagination */
+.pagination .page-link {
+    border-radius: 8px;
+    margin: 0 3px;
+    color: var(--dark);
+    border: 1px solid #e2e8f0;
+    font-size: 0.8rem;
+}
+
+.pagination .page-item.active .page-link {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+.pagination .page-link:hover {
+    color: var(--primary);
+    border-color: var(--primary);
+}
+
+/* Table Row Hover */
+.admin-table tbody tr:hover {
+    background: #f8fafc;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .d-flex.justify-content-between {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .search-box input {
+        width: 100%;
+    }
+    
+    .btn-admin-outline, .btn-admin-primary {
+        padding: 6px 12px;
+        font-size: 0.75rem;
+    }
+    
+    .admin-table th, 
+    .admin-table td {
+        padding: 8px 10px;
+        font-size: 0.75rem;
+    }
+    
+    .product-icon-wrapper {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .product-icon-wrapper i {
+        font-size: 0.9rem;
+    }
+    
+    .btn-action {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .quick-stat h4 {
+        font-size: 1.2rem;
+    }
+}
+
+/* Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.empty-state i {
+    font-size: 60px;
+    color: #cbd5e1;
+    margin-bottom: 20px;
+}
+
+.empty-state h5 {
+    color: var(--dark);
+    margin-bottom: 10px;
+}
+
+.empty-state p {
+    color: var(--gray);
+    margin-bottom: 20px;
+}
+</style>
+
+<script>
+// Search functionality
+const searchInput = document.getElementById('searchInput');
+const tableRows = document.querySelectorAll('#productsTable tbody tr');
+
+if (searchInput) {
+    searchInput.addEventListener('keyup', function() {
+        const searchTerm = this.value.toLowerCase();
+        let visibleCount = 0;
+        
+        tableRows.forEach(row => {
+            const productName = row.getAttribute('data-name') || '';
+            const productCategory = row.getAttribute('data-category') || '';
+            
+            if (productName.includes(searchTerm) || productCategory.includes(searchTerm)) {
+                row.style.display = '';
+                visibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+        
+        // Update showing counts
+        const showingStart = document.getElementById('showingStart');
+        const showingEnd = document.getElementById('showingEnd');
+        if (showingStart && showingEnd) {
+            showingStart.textContent = visibleCount > 0 ? '1' : '0';
+            showingEnd.textContent = visibleCount;
+        }
+    });
+}
+
+// Simple pagination for products table
+function initPagination() {
+    const rows = document.querySelectorAll('#productsTable tbody tr');
+    const rowsPerPage = 10;
+    const totalRows = rows.length;
+    const totalPages = Math.ceil(totalRows / rowsPerPage);
+    let currentPage = 1;
+    
+    function showPage(page) {
+        const start = (page - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+        
+        rows.forEach((row, index) => {
+            if (index >= start && index < end) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+        
+        // Update pagination buttons
+        const prevBtn = document.getElementById('prevPage');
+        const nextBtn = document.getElementById('nextPage');
+        const paginationContainer = document.getElementById('pagination');
+        
+        if (prevBtn && nextBtn && paginationContainer) {
+            prevBtn.parentElement.classList.toggle('disabled', page === 1);
+            nextBtn.parentElement.classList.toggle('disabled', page === totalPages);
+            
+            // Update page numbers
+            const pageLinks = paginationContainer.querySelectorAll('.page-link[data-page]');
+            pageLinks.forEach(link => {
+                link.classList.remove('active');
+                if (parseInt(link.dataset.page) === page) {
+                    link.classList.add('active');
+                }
+            });
+        }
+        
+        // Update showing info
+        const showingStart = document.getElementById('showingStart');
+        const showingEnd = document.getElementById('showingEnd');
+        const totalCount = document.getElementById('totalCount');
+        
+        if (showingStart && showingEnd && totalCount) {
+            const visibleRows = Array.from(rows).filter(row => row.style.display === '').length;
+            showingStart.textContent = visibleRows > 0 ? start + 1 : 0;
+            showingEnd.textContent = Math.min(end, totalRows);
+        }
+    }
+    
+    // Only initialize if more than rowsPerPage rows
+    if (totalRows > rowsPerPage) {
+        showPage(1);
+    }
+}
+
+// Run pagination on load if more than 10 products
+document.addEventListener('DOMContentLoaded', function() {
+    const totalProducts = {{ products|length }};
+    if (totalProducts > 10) {
+        initPagination();
+    }
+    
+    // Add tooltip to action buttons
+    const actionBtns = document.querySelectorAll('.btn-action');
+    actionBtns.forEach(btn => {
+        btn.addEventListener('mouseenter', function() {
+            const title = this.getAttribute('title');
+            if (title) {
+                // Simple tooltip effect
+            }
+        });
+    });
+});
+</script>
 {% endblock %}

@@ -1,607 +1,969 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Golden Kitchen Nigeria{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="description" content="Premium cooking utensils store in Nigeria. Shop quality kitchen tools with nationwide delivery.">
+    <meta name="keywords" content="cooking utensils, kitchenware, Nigeria, cookware, pots, pans, knives">
+    <meta name="author" content="Golden Kitchen Nigeria">
+    <title>{% block title %}Golden Kitchen Nigeria{% endblock %} | Premium Cooking Utensils</title>
+    
+    <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap"
-        rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Cormorant+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Swiper JS for premium sliders -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    
     <style>
         :root {
-            --terracotta: #E67E22;
-            --terracotta-light: #F39C12;
-            --terracotta-dark: #D35400;
-            --gold: #FFD700;
+            --primary: #C6A43F;
+            --primary-dark: #A8882E;
+            --primary-light: #D4B55E;
+            --dark: #1A1A1A;
+            --gray-dark: #2D2D2D;
+            --gray: #6B6B6B;
+            --gray-light: #F5F5F5;
+            --white: #FFFFFF;
+            --success: #2D6A4F;
+            --border: #EAEAEA;
         }
-
+        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
+        
         body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #FFF8F0 0%, #FDF5E6 100%);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--dark);
+            background: var(--white);
+            line-height: 1.6;
         }
-
-        h1,
-        h2,
-        h3,
-        h4,
-        h5,
-        h6 {
-            font-family: 'Playfair Display', serif;
+        
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 600;
+            letter-spacing: -0.02em;
         }
-
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--gray-light);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+        
+        /* Premium Navbar */
         .navbar {
-            background: white !important;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            padding: 1rem 0;
+            background: var(--white) !important;
+            padding: 1.2rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid var(--border);
         }
-
+        
+        .navbar.scrolled {
+            padding: 0.8rem 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+        
         .navbar-brand {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.5rem;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.6rem;
             font-weight: 700;
-            background: linear-gradient(135deg, var(--terracotta), var(--terracotta-dark));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+            color: var(--dark) !important;
+            letter-spacing: -0.5px;
         }
-
+        
         .navbar-brand i {
-            color: var(--terracotta);
+            color: var(--primary);
+            margin-right: 8px;
         }
-
+        
         .nav-link {
             font-weight: 500;
-            color: #2D3436;
-            transition: color 0.3s;
+            color: var(--dark) !important;
+            transition: color 0.3s ease;
+            position: relative;
+            margin: 0 0.25rem;
+            font-size: 0.95rem;
         }
-
-        .nav-link:hover,
-        .nav-link.active {
-            color: var(--terracotta);
+        
+        .nav-link:hover {
+            color: var(--primary) !important;
         }
-
-        .btn-terracotta {
-            background: linear-gradient(135deg, var(--terracotta), var(--terracotta-dark));
+        
+        /* Premium Buttons */
+        .btn-primary-custom {
+            background: var(--primary);
             border: none;
-            color: white;
-            padding: 10px 25px;
-            border-radius: 8px;
-            transition: all 0.3s;
+            color: var(--white);
+            padding: 10px 28px;
+            border-radius: 30px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 0.9rem;
         }
-
-        .btn-terracotta:hover {
+        
+        .btn-primary-custom:hover {
+            background: var(--primary-dark);
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(230, 126, 34, 0.3);
-            color: white;
+            box-shadow: 0 4px 12px rgba(198, 164, 63, 0.3);
+            color: var(--white);
         }
-
-        .btn-outline-terracotta {
-            border: 1px solid var(--terracotta);
-            color: var(--terracotta);
+        
+        .btn-outline-custom {
+            border: 1.5px solid var(--primary);
+            color: var(--primary);
             background: transparent;
-            border-radius: 8px;
-            padding: 10px 25px;
-            transition: all 0.3s;
+            border-radius: 30px;
+            padding: 10px 28px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 0.9rem;
         }
-
-        .btn-outline-terracotta:hover {
-            background: var(--terracotta);
-            color: white;
+        
+        .btn-outline-custom:hover {
+            background: var(--primary);
+            color: var(--white);
+            transform: translateY(-2px);
         }
-
+        
+        /* Cart Badge */
         .cart-badge {
             position: absolute;
             top: -8px;
             right: -8px;
-            background: var(--terracotta);
-            color: white;
+            background: var(--primary);
+            color: var(--white);
             border-radius: 50%;
             padding: 2px 6px;
-            font-size: 11px;
+            font-size: 10px;
+            font-weight: 600;
             min-width: 18px;
+            text-align: center;
         }
-
+        
+        /* Flash Messages */
         .flash-message {
             position: fixed;
-            top: 80px;
+            top: 90px;
             right: 20px;
             z-index: 9999;
             animation: slideIn 0.3s ease;
+            min-width: 320px;
+            border-radius: 12px;
+            border-left: 4px solid var(--primary);
         }
-
+        
         @keyframes slideIn {
             from {
                 transform: translateX(100%);
                 opacity: 0;
             }
-
             to {
                 transform: translateX(0);
                 opacity: 1;
             }
         }
-
+        
+        /* Premium Footer */
         .footer {
-            background: #2C3E50;
-            color: white;
-            padding: 50px 0 20px;
-            margin-top: 60px;
+            background: var(--dark);
+            color: var(--white);
+            padding: 60px 0 30px;
+            margin-top: 80px;
         }
-
+        
         .footer a {
-            color: rgba(255, 255, 255, 0.8);
+            color: rgba(255, 255, 255, 0.7);
             text-decoration: none;
+            transition: color 0.3s ease;
         }
-
+        
         .footer a:hover {
-            color: var(--terracotta);
+            color: var(--primary);
         }
-
-        @media (max-width: 768px) {
-            .navbar .d-flex {
-                margin-top: 10px;
-            }
+        
+        .footer h5 {
+            color: var(--white);
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
         }
-    </style>
-</head>
-
-<body>
-    <nav class="navbar navbar-expand-lg sticky-top">
-        <div class="container">
-            <a class="navbar-brand" href="/">
-                <i class="fas fa-utensils me-2"></i>Golden Kitchen Nigeria
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav mx-auto">
-                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/products">Shop</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/categories">Categories</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/about">About</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/contact">Contact</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/faq">FAQ</a></li>
-                </ul>
-                <div class="d-flex gap-2">
-                    <a href="/wishlist" class="btn btn-outline-secondary position-relative">
-                        <i class="fas fa-heart"></i>
-                    </a>
-                    <a href="/cart" class="btn btn-outline-terracotta position-relative">
-                        <i class="fas fa-shopping-cart"></i> Cart
-                        <span id="cartCount" class="cart-badge">0</span>
-                    </a>
-                    {% if session.user %}
-                    <div class="dropdown">
-                        <button class="btn btn-terracotta dropdown-toggle" data-bs-toggle="dropdown">
-                            <i class="fas fa-user"></i> {{ session.user_name[:15] }}
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="/profile"><i class="fas fa-user me-2"></i>Profile</a>
-                            </li>
-                            <li><a class="dropdown-item" href="/orders"><i class="fas fa-box me-2"></i>My Orders</a>
-                            </li>
-                            <li><a class="dropdown-item" href="/wishlist"><i class="fas fa-heart me-2"></i>Wishlist</a>
-                            </li>
-                            {% if session.is_admin %}
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item" href="/admin"><i class="fas fa-chart-line me-2"></i>Admin
-                                    Panel</a></li>
-                            {% endif %}
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            {% if session.is_admin %}
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item" href="/admin"><i
-                                        class="fas fa-chart-line me-2"></i>Dashboard</a></li>
-                            <li><a class="dropdown-item" href="/admin/products"><i
-                                        class="fas fa-box me-2"></i>Products</a></li>
-                            <li><a class="dropdown-item" href="/admin/orders"><i
-                                        class="fas fa-shopping-cart me-2"></i>Orders</a></li>
-                            <li><a class="dropdown-item" href="/admin/customers"><i
-                                        class="fas fa-users me-2"></i>Customers</a></li>
-                            <li><a class="dropdown-item" href="/admin/coupons"><i
-                                        class="fas fa-ticket-alt me-2"></i>Coupons</a></li>
-                            <li><a class="dropdown-item" href="/admin/reviews"><i
-                                        class="fas fa-star me-2"></i>Reviews</a></li>
-                            <li><a class="dropdown-item" href="/admin/newsletter"><i
-                                        class="fas fa-envelope me-2"></i>Newsletter</a></li>
-                            <li><a class="dropdown-item" href="/admin/reports"><i
-                                        class="fas fa-file-alt me-2"></i>Reports</a></li>
-                                <a class="dropdown-item" href="/admin/bulk-import">📤 Bulk Import</a>
-                                
-                            {% endif %}
-                            <li><a class="dropdown-item" href="/logout"><i
-                                        class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
-                        </ul>
-                    </div>
-                    {% else %}
-                    <a href="/login" class="btn btn-terracotta">Login</a>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <div id="flashMessages"></div>
-
-    {% block content %}{% endblock %}
-
-    <footer class="footer">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-4 mb-4">
-                    <h4><i class="fas fa-utensils text-terracotta"></i> Golden Kitchen Nigeria</h4>
-                    <p>Premium cooking utensils delivered to your doorstep in Nigeria.</p>
-                    <div class="mt-3">
-                        <i class="fab fa-facebook fa-lg me-3"></i>
-                        <i class="fab fa-instagram fa-lg me-3"></i>
-                        <i class="fab fa-twitter fa-lg me-3"></i>
-                        <i class="fab fa-whatsapp fa-lg"></i>
-                    </div>
-                </div>
-                <div class="col-md-2 mb-4">
-                    <h5>Quick Links</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="/">Home</a></li>
-                        <li><a href="/products">Shop</a></li>
-                        <li><a href="/about">About Us</a></li>
-                        <li><a href="/contact">Contact</a></li>
-                    </ul>
-                </div>
-                <div class="col-md-3 mb-4">
-                    <h5>Categories</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="/products?category=Knives">Knives</a></li>
-                        <li><a href="/products?category=Pans">Pans</a></li>
-                        <li><a href="/products?category=Pots">Pots</a></li>
-                        <li><a href="/products?category=Utensils">Utensils</a></li>
-                    </ul>
-                </div>
-                <div class="col-md-3 mb-4">
-                    <h5>Newsletter</h5>
-                    <form method="POST" action="/subscribe-newsletter">
-                        <div class="input-group">
-                            <input type="email" name="email" class="form-control" placeholder="Your email">
-                            <button class="btn btn-terracotta" type="submit">Subscribe</button>
-                        </div>
-                    </form>
-                    <p class="mt-3"><i class="fas fa-phone me-2"></i> +234 812 345 6789</p>
-                    <p><i class="fas fa-envelope me-2"></i> hello@goldenkitchen.ng</p>
-                </div>
-            </div>
-            <div class="text-center pt-4 border-top border-secondary">
-                <p>&copy; 2026 Golden Kitchen Nigeria. All rights reserved. 🇳🇬</p>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Chat Widget -->
-    <div class="chat-widget" id="chatWidget">
-        <div class="chat-button" id="chatButton">
-            <i class="fas fa-comment-dots"></i>
-            <span class="chat-badge" id="chatBadge">0</span>
-        </div>
-        <div class="chat-window" id="chatWindow">
-            <div class="chat-header">
-                <div>
-                    <i class="fas fa-headset"></i> Customer Support
-                    <span class="online-status"><i class="fas fa-circle"></i> Online</span>
-                </div>
-                <button class="chat-close" id="chatClose">×</button>
-            </div>
-            <div class="chat-messages" id="chatMessages">
-                <div class="chat-message support">
-                    <div class="message-content">👋 Hello! Welcome to Golden Kitchen Nigeria. How can we help you today?
-                    </div>
-                    <div class="message-time">Just now</div>
-                </div>
-            </div>
-            <div class="chat-input-area">
-                <input type="text" id="chatInput" placeholder="Type your message..." class="form-control">
-                <button id="chatSend" class="btn btn-terracotta"><i class="fas fa-paper-plane"></i></button>
-            </div>
-        </div>
-    </div>
-
-    <style>
-        .chat-widget {
+        
+        /* Product Cards */
+        .product-card {
+            background: var(--white);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            border: 1px solid var(--border);
+            height: 100%;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary);
+        }
+        
+        .product-image {
+            height: 220px;
+            background: var(--gray-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 52px;
+            color: var(--primary);
+        }
+        
+        /* AI Chat Assistant - Minimal Premium */
+        .chat-assistant {
             position: fixed;
             bottom: 30px;
             right: 30px;
             z-index: 1000;
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
-
+        
         .chat-button {
             width: 60px;
             height: 60px;
-            background: linear-gradient(135deg, #E67E22, #D35400);
+            background: var(--primary);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            box-shadow: 0 4px 15px rgba(230, 126, 34, 0.4);
-            transition: all 0.3s;
-            color: white;
+            box-shadow: 0 4px 15px rgba(198, 164, 63, 0.3);
+            transition: all 0.3s ease;
+            color: var(--white);
             font-size: 24px;
-            position: relative;
         }
-
+        
         .chat-button:hover {
-            transform: scale(1.1);
+            transform: scale(1.05);
+            background: var(--primary-dark);
+            box-shadow: 0 6px 20px rgba(198, 164, 63, 0.4);
         }
-
-        .chat-badge {
+        
+        .notification-badge {
             position: absolute;
             top: -5px;
             right: -5px;
-            background: #e74c3c;
+            background: #E74C3C;
             color: white;
-            font-size: 11px;
-            padding: 2px 6px;
+            font-size: 10px;
+            padding: 3px 6px;
             border-radius: 50%;
-            display: none;
+            min-width: 18px;
+            text-align: center;
+            animation: bounce 0.5s ease;
         }
-
+        
         .chat-window {
             position: absolute;
             bottom: 80px;
             right: 0;
-            width: 350px;
-            height: 450px;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 360px;
+            height: 520px;
+            background: var(--white);
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
             display: none;
             flex-direction: column;
             overflow: hidden;
+            animation: fadeUp 0.3s ease;
+            border: 1px solid var(--border);
         }
-
+        
         .chat-window.active {
             display: flex;
         }
-
+        
         .chat-header {
-            background: linear-gradient(135deg, #E67E22, #D35400);
-            color: white;
-            padding: 12px 15px;
+            background: var(--dark);
+            color: var(--white);
+            padding: 16px 20px;
+        }
+        
+        .chat-avatar {
+            width: 42px;
+            height: 42px;
+            background: var(--primary);
+            border-radius: 50%;
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-size: 20px;
         }
-
-        .online-status {
-            font-size: 11px;
-            margin-left: 10px;
-            background: rgba(255, 255, 255, 0.2);
-            padding: 2px 8px;
-            border-radius: 20px;
+        
+        .chat-info h5 {
+            font-size: 0.95rem;
+            margin-bottom: 2px;
+            color: var(--white);
         }
-
-        .online-status i {
-            font-size: 8px;
-            color: #2ecc71;
-            margin-right: 4px;
+        
+        .chat-info small {
+            font-size: 0.7rem;
+            opacity: 0.8;
         }
-
+        
         .chat-close {
             background: none;
             border: none;
             color: white;
             font-size: 24px;
             cursor: pointer;
+            transition: transform 0.2s;
         }
-
+        
+        .chat-close:hover {
+            transform: scale(1.1);
+        }
+        
         .chat-messages {
             flex: 1;
             padding: 15px;
             overflow-y: auto;
-            background: #f8f9fa;
+            background: var(--gray-light);
         }
-
-        .chat-message {
+        
+        .message {
             margin-bottom: 15px;
             display: flex;
             flex-direction: column;
         }
-
-        .chat-message.user {
+        
+        .message.user {
             align-items: flex-end;
         }
-
-        .chat-message.user .message-content {
-            background: linear-gradient(135deg, #E67E22, #D35400);
+        
+        .message.user .message-content {
+            background: var(--primary);
             color: white;
-            border-radius: 15px 15px 4px 15px;
+            border-radius: 18px 18px 4px 18px;
         }
-
-        .chat-message.support .message-content {
+        
+        .message.bot .message-content {
             background: white;
-            color: #333;
-            border-radius: 15px 15px 15px 4px;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            color: var(--dark);
+            border-radius: 18px 18px 18px 4px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border);
         }
-
+        
         .message-content {
             max-width: 85%;
-            padding: 10px 14px;
+            padding: 10px 15px;
             word-wrap: break-word;
+            font-size: 0.85rem;
+            line-height: 1.4;
         }
-
+        
         .message-time {
-            font-size: 10px;
-            color: #999;
+            font-size: 0.6rem;
+            color: var(--gray);
             margin-top: 4px;
-            margin-left: 5px;
-            margin-right: 5px;
+            margin-left: 10px;
+            margin-right: 10px;
         }
-
+        
+        .chat-typing {
+            padding: 10px 15px;
+            border-top: 1px solid var(--border);
+        }
+        
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: var(--gray);
+            font-size: 0.75rem;
+        }
+        
+        .typing-indicator span {
+            width: 6px;
+            height: 6px;
+            background: var(--primary);
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+        
         .chat-input-area {
             padding: 12px;
-            border-top: 1px solid #eee;
+            border-top: 1px solid var(--border);
             display: flex;
             gap: 10px;
             background: white;
         }
-
+        
         .chat-input-area input {
             flex: 1;
             border-radius: 25px;
+            padding: 8px 15px;
+            border: 1px solid var(--border);
+            font-size: 0.85rem;
         }
-
+        
+        .chat-input-area input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
         .chat-input-area button {
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            width: 38px;
+            height: 38px;
             padding: 0;
+            background: var(--primary);
+            border: none;
+            color: white;
+        }
+        
+        @keyframes fadeUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+        
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+            30% { transform: translateY(-8px); opacity: 1; }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar .container {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .flash-message {
+                left: 10px;
+                right: 10px;
+                min-width: auto;
+            }
+            .chat-window {
+                width: calc(100vw - 40px);
+                right: -20px;
+                bottom: 75px;
+                height: 480px;
+            }
+        }
+        
+        /* Hero Section Gradients */
+        .hero-gradient {
+            background: linear-gradient(135deg, #FFF9F0 0%, #FFFFFF 100%);
+        }
+        
+        /* Section Headers */
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .section-header h2 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .section-header p {
+            color: var(--gray);
+            font-size: 1rem;
+        }
+        
+        /* Form Controls */
+        .form-control, .form-select {
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            padding: 0.6rem 1rem;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.2rem rgba(198, 164, 63, 0.1);
+        }
+        
+        /* Dropdown Menu */
+        .dropdown-menu {
+            border: none;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            padding: 0.5rem 0;
+        }
+        
+        .dropdown-item {
+            padding: 0.5rem 1.5rem;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        
+        .dropdown-item:hover {
+            background: var(--gray-light);
+            color: var(--primary);
+        }
+        
+        /* Loading Spinner */
+        .spinner-border-sm {
+            width: 1rem;
+            height: 1rem;
+            border-width: 0.15em;
         }
     </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg" id="mainNavbar">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('home') }}">
+                <i class="fas fa-utensils"></i>Golden Kitchen
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('home') }}">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('products') }}">Shop</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('about') }}">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('contact') }}">Contact</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('faq') }}">FAQ</a></li>
+                </ul>
+                <div class="d-flex gap-2">
+                    <!-- Search Form -->
+                    <form class="d-none d-md-flex me-2" action="{{ url_for('search') }}" method="GET">
+                        <div class="input-group input-group-sm">
+                            <input type="text" name="q" class="form-control" placeholder="Search..." style="width: 180px;">
+                            <button class="btn btn-primary-custom" type="submit" style="padding: 0.25rem 1rem;">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <!-- Wishlist -->
+                    <a href="{{ url_for('wishlist') }}" class="btn btn-outline-custom position-relative" style="padding: 0.4rem 1rem;">
+                        <i class="fas fa-heart"></i>
+                    </a>
+                    
+                    <!-- Cart -->
+                    <a href="{{ url_for('cart') }}" class="btn btn-outline-custom position-relative" style="padding: 0.4rem 1rem;">
+                        <i class="fas fa-shopping-cart"></i> Cart
+                        <span id="cartCount" class="cart-badge">0</span>
+                    </a>
+                    
+                    <!-- User Menu -->
+                    {% if session.user %}
+                        <div class="dropdown">
+                            <button class="btn btn-primary-custom dropdown-toggle" data-bs-toggle="dropdown" style="padding: 0.4rem 1rem;">
+                                <i class="fas fa-user"></i> {{ session.user_name[:12] }}
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="/profile"><i class="fas fa-user me-2"></i>Profile</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('orders') }}"><i class="fas fa-box me-2"></i>My Orders</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('wishlist') }}"><i class="fas fa-heart me-2"></i>Wishlist</a></li>
+                                {% if session.is_admin %}
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('admin_dashboard') }}"><i class="fas fa-chart-line me-2"></i>Admin Panel</a></li>
+                                {% endif %}
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                            </ul>
+                        </div>
+                    {% else %}
+                        <a href="{{ url_for('login') }}" class="btn btn-primary-custom" style="padding: 0.4rem 1.5rem;">Login</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
 
+    <!-- Flash Messages Container -->
+    <div id="flashMessages"></div>
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <h5><i class="fas fa-utensils me-2" style="color: var(--primary);"></i>Golden Kitchen</h5>
+                    <p class="text-white-50">Premium cooking utensils delivered to your doorstep in Nigeria. Quality kitchen tools for every chef.</p>
+                    <div class="mt-3">
+                        <a href="#" class="me-3"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="me-3"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="me-3"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-whatsapp"></i></a>
+                    </div>
+                </div>
+                <div class="col-md-2 mb-4">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{{ url_for('home') }}">Home</a></li>
+                        <li><a href="{{ url_for('products') }}">Shop</a></li>
+                        <li><a href="{{ url_for('about') }}">About Us</a></li>
+                        <li><a href="{{ url_for('contact') }}">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <h5>Categories</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{{ url_for('products', category='Knives') }}">Knives</a></li>
+                        <li><a href="{{ url_for('products', category='Pans') }}">Pans</a></li>
+                        <li><a href="{{ url_for('products', category='Pots') }}">Pots</a></li>
+                        <li><a href="{{ url_for('products', category='Utensils') }}">Utensils</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <h5>Newsletter</h5>
+                    <form action="{{ url_for('subscribe_newsletter') }}" method="POST">
+                        <div class="input-group">
+                            <input type="email" name="email" class="form-control" placeholder="Your email" required style="background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); color: white;">
+                            <button class="btn btn-primary-custom" type="submit">Subscribe</button>
+                        </div>
+                    </form>
+                    <p class="mt-3 mb-1"><i class="fas fa-phone me-2" style="color: var(--primary);"></i> +234 812 345 6789</p>
+                    <p class="mb-1"><i class="fas fa-envelope me-2" style="color: var(--primary);"></i> hello@goldenkitchen.ng</p>
+                    <p><i class="fas fa-clock me-2" style="color: var(--primary);"></i> Mon-Sat: 9am - 6pm</p>
+                </div>
+            </div>
+            <div class="text-center pt-4 border-top" style="border-color: rgba(255,255,255,0.1) !important;">
+                <p class="mb-0">&copy; 2025 Golden Kitchen Nigeria. All rights reserved. 🇳🇬</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- AI Chat Assistant Widget -->
+    <div class="chat-assistant" id="chatAssistant">
+        <div class="chat-button" id="chatButton">
+            <i class="fas fa-comment-dots"></i>
+            <span class="notification-badge" id="notificationBadge">1</span>
+        </div>
+        
+        <div class="chat-window" id="chatWindow">
+            <div class="chat-header d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <div class="chat-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="chat-info">
+                        <h5 class="mb-0">Golden Assistant</h5>
+                        <small>Online • Usually replies instantly</small>
+                    </div>
+                </div>
+                <button class="chat-close" id="closeChat">×</button>
+            </div>
+            
+            <div class="chat-messages" id="chatMessages">
+                <div class="message bot">
+                    <div class="message-content">
+                        👋 Hello! I'm your Golden Kitchen assistant.<br><br>
+                        I can help you with:
+                        <ul class="mb-0 mt-2" style="margin-left: 1rem;">
+                            <li>📦 Order tracking</li>
+                            <li>🚚 Shipping information</li>
+                            <li>💰 Product prices</li>
+                            <li>🔄 Returns & refunds</li>
+                        </ul>
+                    </div>
+                    <div class="message-time">Just now</div>
+                </div>
+            </div>
+            
+            <div class="chat-typing" id="chatTyping" style="display: none;">
+                <div class="typing-indicator">
+                    <span></span><span></span><span></span>
+                    <span class="ms-2">Typing...</span>
+                </div>
+            </div>
+            
+            <div class="chat-input-area">
+                <input type="text" id="chatInput" class="form-control" placeholder="Type your message..." autocomplete="off">
+                <button id="sendChat">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
     <script>
-        // Chat functionality
-        const chatButton = document.getElementById('chatButton');
-        const chatWindow = document.getElementById('chatWindow');
-        const chatClose = document.getElementById('chatClose');
-        const chatInput = document.getElementById('chatInput');
-        const chatSend = document.getElementById('chatSend');
-        const chatMessages = document.getElementById('chatMessages');
-        const chatBadge = document.getElementById('chatBadge');
-
-        let chatMessagesList = JSON.parse(localStorage.getItem('chatMessages') || '[]');
-
-        function loadChatMessages() {
-            chatMessages.innerHTML = '';
-            chatMessagesList.forEach(msg => {
-                addMessageToChat(msg.text, msg.type, msg.time);
-            });
-        }
-
-        function addMessageToChat(message, type, time) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `chat-message ${type}`;
-            messageDiv.innerHTML = `
-        <div class="message-content">${message}</div>
-        <div class="message-time">${time}</div>
-    `;
-            chatMessages.appendChild(messageDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
-        function sendMessage() {
-            const message = chatInput.value.trim();
-            if (!message) return;
-
-            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-            // Add user message
-            addMessageToChat(message, 'user', time);
-            chatMessagesList.push({ text: message, type: 'user', time: time });
-
-            // Save to localStorage
-            localStorage.setItem('chatMessages', JSON.stringify(chatMessagesList));
-
-            chatInput.value = '';
-
-            // Auto reply
-            setTimeout(() => {
-                const replyTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                let reply = "Thank you for your message! Our customer support team will respond shortly. Please provide your order number if you have any questions about your order.";
-
-                addMessageToChat(reply, 'support', replyTime);
-                chatMessagesList.push({ text: reply, type: 'support', time: replyTime });
-                localStorage.setItem('chatMessages', JSON.stringify(chatMessagesList));
-            }, 1000);
-        }
-
-        chatButton.addEventListener('click', () => {
-            chatWindow.classList.toggle('active');
-            if (chatWindow.classList.contains('active')) {
-                chatBadge.style.display = 'none';
-                chatBadge.textContent = '0';
-                loadChatMessages();
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('mainNavbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
             }
         });
-
-        chatClose.addEventListener('click', () => {
-            chatWindow.classList.remove('active');
-        });
-
-        chatSend.addEventListener('click', sendMessage);
-        chatInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') sendMessage();
-        });
-
-        // Load messages on page load
-        loadChatMessages();
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
+        
+        // Update cart count
         function updateCartCount() {
             fetch('/cart/count')
-                .then(r => r.json())
+                .then(response => response.json())
                 .then(data => {
                     const badge = document.getElementById('cartCount');
                     if (badge) {
                         badge.textContent = data.count;
-                        badge.style.display = data.count > 0 ? 'inline-block' : 'inline-block';
                     }
-                });
+                })
+                .catch(error => console.error('Error fetching cart count:', error));
         }
-
+        
+        // Add to cart function
         function addToCart(productId) {
             fetch('/add-to-cart', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ product_id: productId })
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({product_id: productId})
             })
-                .then(r => r.json())
-                .then(data => {
-                    if (data.success) {
-                        updateCartCount();
-                        showFlash('Added to cart!', 'success');
-                    }
-                });
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    updateCartCount();
+                    showFlash('Added to cart!', 'success');
+                } else if (data.error) {
+                    showFlash(data.error, 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showFlash('Error adding to cart', 'danger');
+            });
         }
-
+        
+        // Add to wishlist
         function addToWishlist(productId) {
-            fetch(`/add-to-wishlist/${productId}`, { method: 'POST' })
-                .then(r => r.json())
+            fetch(`/add-to-wishlist/${productId}`, {method: 'POST'})
+                .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        showFlash('Added to wishlist!', 'success');
+                        showFlash(data.message, 'success');
                     } else if (data.error) {
-                        showFlash(data.error, 'danger');
+                        showFlash(data.error, 'warning');
                     } else {
-                        showFlash('Already in wishlist', 'info');
+                        showFlash(data.message || 'Already in wishlist', 'info');
                     }
+                })
+                .catch(() => {
+                    showFlash('Please login to add to wishlist', 'warning');
                 });
         }
-
+        
+        // Show flash message
         function showFlash(message, type) {
+            const flashContainer = document.getElementById('flashMessages');
             const flash = document.createElement('div');
-            flash.className = `alert alert-${type === 'success' ? 'success' : type === 'danger' ? 'danger' : 'info'} alert-dismissible fade show flash-message`;
-            flash.innerHTML = `${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>`;
-            document.getElementById('flashMessages').appendChild(flash);
-            setTimeout(() => flash.remove(), 5000);
+            const bgColor = type === 'success' ? '#2D6A4F' : type === 'danger' ? '#C0392B' : '#C6A43F';
+            flash.className = `alert alert-${type === 'success' ? 'success' : type === 'danger' ? 'danger' : type === 'warning' ? 'warning' : 'info'} alert-dismissible fade show flash-message`;
+            flash.style.background = 'white';
+            flash.style.borderLeftColor = bgColor;
+            flash.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'danger' ? 'exclamation-circle' : 'info-circle'} me-2" style="color: ${bgColor};"></i>
+                <span>${message}</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+            flashContainer.appendChild(flash);
+            
+            setTimeout(() => {
+                if (flash && flash.remove) {
+                    flash.remove();
+                }
+            }, 5000);
         }
-
-        document.addEventListener('DOMContentLoaded', updateCartCount);
+        
+        // AI Chat Assistant
+        class ChatAssistant {
+            constructor() {
+                this.messages = [];
+                this.init();
+            }
+            
+            init() {
+                this.chatButton = document.getElementById('chatButton');
+                this.chatWindow = document.getElementById('chatWindow');
+                this.closeChat = document.getElementById('closeChat');
+                this.chatInput = document.getElementById('chatInput');
+                this.sendButton = document.getElementById('sendChat');
+                this.chatMessages = document.getElementById('chatMessages');
+                this.typingIndicator = document.getElementById('chatTyping');
+                this.notificationBadge = document.getElementById('notificationBadge');
+                
+                this.loadMessages();
+                this.setupEventListeners();
+            }
+            
+            setupEventListeners() {
+                this.chatButton.addEventListener('click', () => this.toggleChat());
+                this.closeChat.addEventListener('click', () => this.closeChatWindow());
+                this.sendButton.addEventListener('click', () => this.sendMessage());
+                this.chatInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.sendMessage();
+                });
+            }
+            
+            toggleChat() {
+                const isActive = this.chatWindow.classList.contains('active');
+                if (!isActive) {
+                    this.chatWindow.classList.add('active');
+                    if (this.notificationBadge) this.notificationBadge.style.display = 'none';
+                    this.chatInput.focus();
+                } else {
+                    this.chatWindow.classList.remove('active');
+                }
+                this.scrollToBottom();
+            }
+            
+            closeChatWindow() {
+                this.chatWindow.classList.remove('active');
+            }
+            
+            loadMessages() {
+                const saved = localStorage.getItem('chatMessages');
+                if (saved) {
+                    this.messages = JSON.parse(saved);
+                    this.renderMessages();
+                }
+            }
+            
+            saveMessages() {
+                localStorage.setItem('chatMessages', JSON.stringify(this.messages));
+            }
+            
+            renderMessages() {
+                if (!this.chatMessages) return;
+                this.chatMessages.innerHTML = '';
+                this.messages.forEach(msg => {
+                    this.addMessageToDOM(msg.text, msg.type, msg.time);
+                });
+                this.scrollToBottom();
+            }
+            
+            addMessageToDOM(message, type, time) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${type}`;
+                messageDiv.innerHTML = `
+                    <div class="message-content">
+                        ${type === 'bot' ? '<i class="fas fa-robot me-2"></i>' : ''}${message}
+                    </div>
+                    <div class="message-time">${time || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                `;
+                this.chatMessages.appendChild(messageDiv);
+                this.scrollToBottom();
+            }
+            
+            showTyping() {
+                this.typingIndicator.style.display = 'block';
+                this.scrollToBottom();
+            }
+            
+            hideTyping() {
+                this.typingIndicator.style.display = 'none';
+            }
+            
+            scrollToBottom() {
+                if (this.chatMessages) {
+                    this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
+                }
+            }
+            
+            async getAIResponse(userMessage) {
+                const lowerMsg = userMessage.toLowerCase();
+                
+                if (lowerMsg.includes('order') && lowerMsg.includes('track')) {
+                    return "To track your order, please go to 'My Orders' in your account dashboard. You'll find real-time tracking information there.";
+                }
+                else if (lowerMsg.includes('shipping') || lowerMsg.includes('delivery')) {
+                    return "We deliver nationwide within 2-5 business days. Free shipping on orders over ₦50,000!";
+                }
+                else if (lowerMsg.includes('return') || lowerMsg.includes('refund')) {
+                    return "We offer a 7-day return policy for unused items in original packaging. Please contact our support team to initiate a return.";
+                }
+                else if (lowerMsg.includes('price') || lowerMsg.includes('cost')) {
+                    return "You can view all product prices on our Shop page. Use code WELCOME10 for 10% off your first order!";
+                }
+                else if (lowerMsg.includes('discount') || lowerMsg.includes('coupon')) {
+                    return "Active coupons: WELCOME10 (10% off first order), SAVE20 (₦20,000 off on orders over ₦100,000)";
+                }
+                else if (lowerMsg.includes('hello') || lowerMsg.includes('hi')) {
+                    return "Hello! 👋 Welcome to Golden Kitchen Nigeria. How can I assist you today?";
+                }
+                else {
+                    return "Thank you for your message! If you need specific assistance, please visit our Shop page or contact our support team. How else can I help?";
+                }
+            }
+            
+            async sendMessage() {
+                const message = this.chatInput.value.trim();
+                if (!message) return;
+                
+                const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                
+                this.addMessageToDOM(message, 'user', time);
+                this.messages.push({ text: message, type: 'user', time: time });
+                this.saveMessages();
+                
+                this.chatInput.value = '';
+                this.showTyping();
+                
+                setTimeout(async () => {
+                    const response = await this.getAIResponse(message);
+                    this.hideTyping();
+                    
+                    const responseTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    this.addMessageToDOM(response, 'bot', responseTime);
+                    this.messages.push({ text: response, type: 'bot', time: responseTime });
+                    this.saveMessages();
+                }, 800);
+            }
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCartCount();
+            window.chatAssistant = new ChatAssistant();
+        });
     </script>
+    
+    {% block extra_js %}{% endblock %}
 </body>
-
 </html>

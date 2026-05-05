@@ -3,63 +3,194 @@
 {% block title %}Login - Golden Kitchen Nigeria{% endblock %}
 
 {% block content %}
-<div class="container my-5">
-    <div class="row justify-content-center">
-        <div class="col-md-5">
-            <div class="card border-0 shadow-lg">
-                <div class="card-body p-5">
-                    <div class="text-center mb-4">
-                        <i class="fas fa-utensils fa-3x" style="color: #E67E22;"></i>
-                        <h3 class="mt-2">Welcome Back!</h3>
-                        <p class="text-muted">Login to your account</p>
+<!-- Login Hero Section -->
+<section style="position: relative; min-height: calc(100vh - 200px); display: flex; align-items: center; padding: 60px 0; overflow: hidden;">
+    <!-- Video Background -->
+    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;">
+        <video autoplay muted loop playsinline style="width: 100%; height: 100%; object-fit: cover; opacity: 0.4;">
+            <source src="https://cdn.pixabay.com/video/2019/09/19/25716-361896455_large.mp4" type="video/mp4">
+        </video>
+        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,248,240,0.9));"></div>
+    </div>
+    
+    <div class="container" style="position: relative; z-index: 2;">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5" data-aos="fade-up">
+                <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                    <!-- Card Header -->
+                    <div style="background: linear-gradient(135deg, var(--dark), #2D2D2D); padding: 30px; text-align: center;">
+                        <div style="width: 70px; height: 70px; background: rgba(198,164,63,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
+                            <i class="fas fa-utensils fa-2x" style="color: var(--primary);"></i>
+                        </div>
+                        <h3 style="color: white; margin-bottom: 5px; font-family: 'Cormorant Garamond', serif;">Welcome Back!</h3>
+                        <p style="color: rgba(255,255,255,0.7); margin-bottom: 0;">Login to your Golden Kitchen account</p>
                     </div>
                     
-                    <form method="POST">
-                        <div class="mb-3">
-                            <label class="form-label">Email Address</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
-                                <input type="email" name="email" class="form-control" required placeholder="hello@goldenkitchen.ng">
+                    <div class="card-body p-4">
+                        <!-- Social Login Options -->
+                        <div class="social-login mb-4">
+                            <button class="btn w-100 mb-2" style="background: #4267B2; color: white; border-radius: 30px; padding: 10px;">
+                                <i class="fab fa-facebook-f me-2"></i> Continue with Facebook
+                            </button>
+                            <button class="btn w-100" style="background: #DB4437; color: white; border-radius: 30px; padding: 10px;">
+                                <i class="fab fa-google me-2"></i> Continue with Google
+                            </button>
+                        </div>
+                        
+                        <div class="divider text-center position-relative mb-4">
+                            <hr>
+                            <span class="px-3 bg-white" style="position: relative; top: -12px; color: var(--gray);">OR</span>
+                        </div>
+                        
+                        <form method="POST" id="loginForm">
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Email Address</label>
+                                <div class="input-group">
+                                    <span class="input-group-text" style="background: var(--gray-light); border-right: none;">
+                                        <i class="fas fa-envelope" style="color: var(--primary);"></i>
+                                    </span>
+                                    <input type="email" name="email" class="form-control" placeholder="hello@example.com" required style="border-left: none;">
+                                </div>
                             </div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Password</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                                <input type="password" name="password" class="form-control" id="password" required>
-                                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword()">
-                                    <i class="fas fa-eye"></i>
-                                </button>
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text" style="background: var(--gray-light); border-right: none;">
+                                        <i class="fas fa-lock" style="color: var(--primary);"></i>
+                                    </span>
+                                    <input type="password" name="password" class="form-control" id="password" required style="border-left: none;">
+                                    <button class="btn btn-outline-secondary" type="button" onclick="togglePassword()" style="border-left: none;">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                        <div class="mb-3 form-check">
-                            <input type="checkbox" class="form-check-input" id="remember">
-                            <label class="form-check-label">Remember Me</label>
-                        </div>
-                        <button type="submit" class="btn btn-terracotta w-100 py-2">
-                            <i class="fas fa-sign-in-alt me-2"></i> Login
-                        </button>
-                    </form>
-                    
-                    <hr class="my-4">
-                    
-                    <p class="text-center mb-0">
-                        Don't have an account? <a href="/register" class="fw-bold" style="color: #E67E22;">Register</a>
-                    </p>
+                            
+                            <div class="mb-4 d-flex justify-content-between align-items-center flex-wrap">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="remember">
+                                    <label class="form-check-label small">Remember Me</label>
+                                </div>
+                                <a href="/forgot-password" class="small" style="color: var(--primary); text-decoration: none;">
+                                    <i class="fas fa-key me-1"></i>Forgot Password?
+                                </a>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary-custom w-100 py-3" style="font-weight: 600;">
+                                <i class="fas fa-sign-in-alt me-2"></i>Login
+                            </button>
+                        </form>
+                        
+                        <hr class="my-4">
+                        
+                        <p class="text-center mb-0">
+                            Don't have an account? <a href="/register" class="fw-bold" style="color: var(--primary); text-decoration: none;">Create Account</a>
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Trust Badges -->
+                <div class="text-center mt-4">
+                    <div class="d-flex justify-content-center gap-4 flex-wrap">
+                        <span class="small text-muted"><i class="fas fa-lock me-1" style="color: var(--primary);"></i> Secure Login</span>
+                        <span class="small text-muted"><i class="fas fa-shield-alt me-1" style="color: var(--primary);"></i> 2FA Available</span>
+                        <span class="small text-muted"><i class="fas fa-headset me-1" style="color: var(--primary);"></i> 24/7 Support</span>
+                    </div>
+                </div>
+                
+                <!-- Demo Credentials (For testing only - remove in production) -->
+                <div class="alert alert-info mt-4 small" style="background: rgba(198,164,63,0.1); border-color: var(--primary);">
+                    <i class="fas fa-info-circle me-2" style="color: var(--primary);"></i>
+                    <strong>Demo Credentials:</strong><br>
+                    Email: demo@goldenkitchen.ng<br>
+                    Password: Demo@123
                 </div>
             </div>
-            <p class="text-center text-muted mt-3 small">
-                <i class="fas fa-shield-alt"></i> Your data is secure with us
-            </p>
         </div>
     </div>
-</div>
+</section>
+
+<style>
+    .divider hr {
+        margin: 0;
+    }
+    
+    .form-control:focus {
+        box-shadow: none;
+        border-color: var(--primary);
+    }
+    
+    .input-group-text {
+        background-color: var(--gray-light);
+    }
+    
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .card {
+        animation: slideInUp 0.5s ease;
+    }
+    
+    .alert-info {
+        background: rgba(198, 164, 63, 0.1);
+        border: 1px solid rgba(198, 164, 63, 0.3);
+        color: var(--dark);
+    }
+</style>
 
 <script>
 function togglePassword() {
     const password = document.getElementById('password');
     const type = password.type === 'password' ? 'text' : 'password';
     password.type = type;
+}
+
+// Form validation
+document.getElementById('loginForm').addEventListener('submit', function(e) {
+    const email = document.querySelector('input[name="email"]').value;
+    const password = document.querySelector('input[name="password"]').value;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    
+    if (!emailRegex.test(email)) {
+        e.preventDefault();
+        showFlash('Please enter a valid email address', 'danger');
+        return;
+    }
+    
+    if (password.length < 4) {
+        e.preventDefault();
+        showFlash('Password must be at least 4 characters', 'danger');
+        return;
+    }
+    
+    // Show loading state
+    const submitBtn = this.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Logging in...';
+});
+
+// Remember Me functionality
+document.getElementById('remember').addEventListener('change', function() {
+    if (this.checked) {
+        localStorage.setItem('rememberEmail', document.querySelector('input[name="email"]').value);
+    } else {
+        localStorage.removeItem('rememberEmail');
+    }
+});
+
+// Load remembered email
+const rememberedEmail = localStorage.getItem('rememberEmail');
+if (rememberedEmail) {
+    document.querySelector('input[name="email"]').value = rememberedEmail;
+    document.getElementById('remember').checked = true;
 }
 </script>
 {% endblock %}

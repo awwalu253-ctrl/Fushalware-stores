@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, session, redirect, url_for, flash, jsonify, send_file
+from flask_login import LoginManager, current_user, login_user, logout_user, login_required
 import os
 import json
 import csv
@@ -7,12 +8,58 @@ from datetime import datetime, timedelta
 import secrets
 import uuid
 
+# Create Flask app FIRST
 app = Flask(__name__, template_folder='../templates')
 app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
 
-# ==================== DATA STORAGE (In-memory for Vercel compatibility) ====================
+# Initialize Flask-Login AFTER app is created
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+login_manager.login_message = 'Please log in to access this page.'
 
-# Products with categories
+# User loader callback
+@login_manager.user_loader
+def load_user(user_id):
+    # Since you're using in-memory USERS list
+    for user in USERS:
+        if str(user.get('id')) == str(user_id):
+            # Create a simple user object
+            class User:
+                def __init__(self, user_data):
+                    self.id = user_data.get('id')
+                    self.email = user_data.get('email')
+                    self.name = user_data.get('name')
+                    self.is_admin = user_data.get('is_admin', False)
+                    self.is_authenticated = True
+                    self.is_active = True
+                    self.is_anonymous = False
+                
+                def get_id(self):
+                    return str(self.id)
+                
+                def get_full_name(self):
+                    return self.name or self.email
+                
+                def is_authenticated(self):
+                    return True
+                
+                def is_active(self):
+                    return True
+                
+                def is_anonymous(self):
+                    return False
+            
+            return User(user)
+    return None
+
+# Make current_user available to all templates
+@app.context_processor
+def inject_current_user():
+    return dict(current_user=current_user)
+
+# ==================== DATA STORAGE ====================
+
 PRODUCTS = [
     {'id': 1, 'name': 'Professional Chef Knife', 'description': 'High-carbon stainless steel chef knife with ergonomic handle', 'price': 89999, 'compare_price': 129999, 'image': 'knife', 'category': 'Knives', 'stock': 50, 'featured': True, 'bestseller': True, 'rating': 4.8, 'reviews': 124},
     {'id': 2, 'name': 'Non-Stick Frying Pan', 'description': 'Durable non-stick coating, even heat distribution', 'price': 49999, 'compare_price': 79999, 'image': 'pan', 'category': 'Pans', 'stock': 100, 'featured': True, 'bestseller': True, 'rating': 4.6, 'reviews': 89},
@@ -24,7 +71,6 @@ PRODUCTS = [
     {'id': 8, 'name': 'Measuring Cups Set', 'description': 'Stainless steel measuring cups and spoons', 'price': 14999, 'compare_price': 24999, 'image': 'cup', 'category': 'Utensils', 'stock': 150, 'featured': False, 'bestseller': False, 'rating': 4.6, 'reviews': 112},
 ]
 
-# Categories
 CATEGORIES = [
     {'id': 1, 'name': 'Knives', 'slug': 'knives', 'icon': 'knife', 'count': 2},
     {'id': 2, 'name': 'Pans', 'slug': 'pans', 'icon': 'pan', 'count': 1},
@@ -32,48 +78,34 @@ CATEGORIES = [
     {'id': 4, 'name': 'Utensils', 'slug': 'utensils', 'icon': 'utensils', 'count': 3},
 ]
 
-# Orders storage
 ORDERS = []
-
-# Users storage
 USERS = []
-
-# Coupons storage
 COUPONS = [
     {'id': 1, 'code': 'WELCOME10', 'description': '10% off your first order', 'discount_type': 'percentage', 'discount_value': 10, 'min_order': 5000, 'max_discount': 5000, 'used_count': 0, 'usage_limit': 100, 'expiry_date': (datetime.now() + timedelta(days=365)).isoformat(), 'active': True},
     {'id': 2, 'code': 'SAVE20', 'description': '₦20,000 off on orders over ₦100,000', 'discount_type': 'fixed', 'discount_value': 20000, 'min_order': 100000, 'used_count': 0, 'usage_limit': 50, 'expiry_date': (datetime.now() + timedelta(days=180)).isoformat(), 'active': True},
 ]
 
-# Newsletter subscribers
 NEWSLETTER_SUBSCRIBERS = []
-
-# Reviews
 REVIEWS = [
     {'id': 1, 'product_id': 1, 'user': 'John D.', 'rating': 5, 'title': 'Excellent knife!', 'comment': 'Very sharp and well-balanced. Highly recommend!', 'date': '2024-01-15', 'approved': True},
     {'id': 2, 'product_id': 2, 'user': 'Mary A.', 'rating': 4, 'title': 'Great non-stick pan', 'comment': 'Food slides right off. Very easy to clean.', 'date': '2024-01-20', 'approved': True},
 ]
 
-# Wishlist
 WISHLISTS = {}
+chat_sessions = {}
 
 # ==================== HELPER FUNCTIONS ====================
 
 def get_products(category=None, search=None, sort=None, min_price=None, max_price=None):
-    """Get products with filters"""
     products = PRODUCTS.copy()
-    
     if category:
         products = [p for p in products if p['category'].lower() == category.lower()]
-    
     if search:
         products = [p for p in products if search.lower() in p['name'].lower() or search.lower() in p['description'].lower()]
-    
     if min_price:
         products = [p for p in products if p['price'] >= float(min_price)]
-    
     if max_price:
         products = [p for p in products if p['price'] <= float(max_price)]
-    
     if sort == 'price_asc':
         products.sort(key=lambda x: x['price'])
     elif sort == 'price_desc':
@@ -82,7 +114,6 @@ def get_products(category=None, search=None, sort=None, min_price=None, max_pric
         products.sort(key=lambda x: x.get('rating', 0), reverse=True)
     elif sort == 'bestseller':
         products.sort(key=lambda x: x.get('bestseller', False), reverse=True)
-    
     return products
 
 def get_product(product_id):
@@ -119,45 +150,25 @@ def apply_coupon(coupon_code, subtotal):
     coupon = next((c for c in COUPONS if c['code'] == coupon_code.upper() and c['active']), None)
     if not coupon:
         return None, 0
-    
     expiry = datetime.fromisoformat(coupon['expiry_date']) if coupon['expiry_date'] else None
     if expiry and expiry < datetime.now():
         return {'error': 'Coupon has expired'}, 0
-    
     if coupon['usage_limit'] and coupon['used_count'] >= coupon['usage_limit']:
         return {'error': 'Coupon usage limit reached'}, 0
-    
     if subtotal < coupon['min_order']:
         return {'error': f'Minimum order of ₦{coupon["min_order"]:,.0f} required'}, 0
-    
     if coupon['discount_type'] == 'percentage':
         discount = subtotal * (coupon['discount_value'] / 100)
         if coupon.get('max_discount'):
             discount = min(discount, coupon['max_discount'])
     else:
         discount = min(coupon['discount_value'], subtotal)
-    
     return coupon, discount
 
 def generate_order_number():
     timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
     random_part = secrets.token_hex(4).upper()
     return f"GK-{timestamp}-{random_part}"
-
-def get_sales_stats(days=30):
-    start_date = datetime.now() - timedelta(days=days)
-    recent_orders = [o for o in ORDERS if datetime.fromisoformat(o['created_at']) >= start_date]
-    
-    total_sales = sum(o['total_amount'] for o in recent_orders)
-    total_orders = len(recent_orders)
-    avg_order = total_sales / total_orders if total_orders > 0 else 0
-    
-    return {
-        'total_sales': total_sales,
-        'total_orders': total_orders,
-        'avg_order': avg_order,
-        'orders_count': total_orders
-    }
 
 # ==================== PUBLIC ROUTES ====================
 
@@ -174,7 +185,6 @@ def products():
     sort = request.args.get('sort')
     min_price = request.args.get('min_price')
     max_price = request.args.get('max_price')
-    
     products_list = get_products(category, search, sort, min_price, max_price)
     return render_template('products.html', products=products_list, categories=CATEGORIES, current_category=category)
 
@@ -184,8 +194,7 @@ def product_detail(product_id):
     if not product:
         flash('Product not found', 'danger')
         return redirect(url_for('products'))
-    
-    product_reviews = [r for r in REVIEWS if r['product_id'] == product_id and r['approved']]
+    product_reviews = [r for r in REVIEWS if r['product_id'] == product_id and r.get('approved', False)]
     return render_template('product_detail.html', product=product, reviews=product_reviews)
 
 @app.route('/search')
@@ -195,7 +204,7 @@ def search():
     return render_template('search_results.html', products=results, query=query)
 
 @app.route('/categories')
-def categories():
+def categories_page():
     return render_template('categories.html', categories=CATEGORIES)
 
 @app.route('/about')
@@ -231,7 +240,6 @@ def cart():
     cart = session.get('cart', {})
     cart_items = []
     total = 0
-    
     for product_id, quantity in cart.items():
         product = get_product(int(product_id))
         if product:
@@ -242,16 +250,13 @@ def cart():
                 'quantity': quantity,
                 'total': item_total
             })
-    
     coupon = session.get('coupon')
     discount = 0
     if coupon:
         coupon_data, discount = apply_coupon(coupon['code'], total)
         if coupon_data and isinstance(coupon_data, dict) and 'error' in coupon_data:
             session.pop('coupon', None)
-    
     final_total = total - discount
-    
     return render_template('cart.html', cart_items=cart_items, total=total, discount=discount, final_total=final_total, coupon=session.get('coupon'))
 
 @app.route('/cart/count')
@@ -281,14 +286,6 @@ def update_cart():
     session['cart'] = cart
     return jsonify({'success': True})
 
-@app.route('/admin/remove-subscriber/<email>', methods=['POST'])
-def remove_subscriber(email):
-    if not session.get('is_admin'):
-        return jsonify({'success': False})
-    if email in NEWSLETTER_SUBSCRIBERS:
-        NEWSLETTER_SUBSCRIBERS.remove(email)
-    return jsonify({'success': True})
-
 @app.route('/remove-from-cart/<int:product_id>', methods=['POST'])
 def remove_from_cart(product_id):
     cart = session.get('cart', {})
@@ -301,9 +298,7 @@ def apply_coupon_route():
     coupon_code = request.form.get('coupon_code', '').strip().upper()
     cart = session.get('cart', {})
     subtotal = calculate_cart_total(cart)
-    
     coupon, discount = apply_coupon(coupon_code, subtotal)
-    
     if isinstance(coupon, dict) and 'error' in coupon:
         flash(coupon['error'], 'danger')
     elif coupon:
@@ -311,7 +306,6 @@ def apply_coupon_route():
         flash(f'Coupon {coupon_code} applied! You saved ₦{discount:,.0f}', 'success')
     else:
         flash('Invalid coupon code', 'danger')
-    
     return redirect(url_for('cart'))
 
 @app.route('/remove-coupon', methods=['POST'])
@@ -327,7 +321,6 @@ def wishlist():
     if 'user' not in session:
         flash('Please login to view your wishlist', 'warning')
         return redirect(url_for('login'))
-    
     user_email = session['user']
     wishlist_items = WISHLISTS.get(user_email, [])
     products_in_wishlist = [get_product(pid) for pid in wishlist_items if get_product(pid)]
@@ -337,27 +330,22 @@ def wishlist():
 def add_to_wishlist(product_id):
     if 'user' not in session:
         return jsonify({'success': False, 'error': 'Please login first'}), 401
-    
     user_email = session['user']
     if user_email not in WISHLISTS:
         WISHLISTS[user_email] = []
-    
     if product_id not in WISHLISTS[user_email]:
         WISHLISTS[user_email].append(product_id)
         return jsonify({'success': True, 'message': 'Added to wishlist'})
-    
     return jsonify({'success': False, 'message': 'Already in wishlist'})
 
 @app.route('/remove-from-wishlist/<int:product_id>', methods=['POST'])
 def remove_from_wishlist(product_id):
     if 'user' not in session:
         return jsonify({'success': False}), 401
-    
     user_email = session['user']
     if user_email in WISHLISTS and product_id in WISHLISTS[user_email]:
         WISHLISTS[user_email].remove(product_id)
         return jsonify({'success': True})
-    
     return jsonify({'success': False})
 
 # ==================== REVIEW ROUTES ====================
@@ -367,21 +355,12 @@ def add_review(product_id):
     if 'user' not in session:
         flash('Please login to leave a review', 'warning')
         return redirect(url_for('login'))
-    
     rating = int(request.form.get('rating', 0))
     title = request.form.get('title')
     comment = request.form.get('comment')
-    
     if rating < 1 or rating > 5:
         flash('Please provide a valid rating', 'danger')
         return redirect(url_for('product_detail', product_id=product_id))
-    
-    # Check if user already reviewed this product
-    existing = next((r for r in REVIEWS if r['product_id'] == product_id and r['user'] == session['user']), None)
-    if existing:
-        flash('You have already reviewed this product', 'warning')
-        return redirect(url_for('product_detail', product_id=product_id))
-    
     review = {
         'id': len(REVIEWS) + 1,
         'product_id': product_id,
@@ -390,12 +369,10 @@ def add_review(product_id):
         'title': title,
         'comment': comment,
         'date': datetime.now().strftime('%Y-%m-%d'),
-        'approved': False,  # Needs admin approval
-        'verified_purchase': False  # Check if user actually bought the product
+        'approved': False,
+        'verified_purchase': False
     }
-    
     REVIEWS.append(review)
-    
     flash('Thank you for your review! It will appear after moderation.', 'success')
     return redirect(url_for('product_detail', product_id=product_id))
 
@@ -418,20 +395,16 @@ def checkout():
     if 'user' not in session:
         flash('Please login to checkout', 'warning')
         return redirect(url_for('login'))
-    
     cart = session.get('cart', {})
     if not cart:
         flash('Your cart is empty', 'warning')
         return redirect(url_for('products'))
-    
     subtotal = calculate_cart_total(cart)
     coupon = session.get('coupon')
     discount = coupon.get('discount', 0) if coupon else 0
     total = subtotal - discount
-    
     shipping = 0 if total >= 50000 else 2500
     final_total = total + shipping
-    
     return render_template('checkout.html', subtotal=subtotal, discount=discount, total=total, shipping=shipping, final_total=final_total)
 
 @app.route('/place-order', methods=['POST'])
@@ -439,7 +412,6 @@ def place_order():
     if 'user' not in session:
         flash('Please login to place order', 'warning')
         return redirect(url_for('login'))
-    
     name = request.form.get('name')
     email = request.form.get('email')
     phone = request.form.get('phone')
@@ -447,7 +419,6 @@ def place_order():
     city = request.form.get('city')
     state = request.form.get('state')
     payment = request.form.get('payment')
-    
     cart = session.get('cart', {})
     subtotal = calculate_cart_total(cart)
     coupon = session.get('coupon')
@@ -455,7 +426,6 @@ def place_order():
     total = subtotal - discount
     shipping = 0 if total >= 50000 else 2500
     final_total = total + shipping
-    
     order = {
         'id': len(ORDERS) + 1,
         'order_number': generate_order_number(),
@@ -476,17 +446,12 @@ def place_order():
         'created_at': datetime.now().isoformat()
     }
     ORDERS.append(order)
-    
-    # Clear cart and coupon
     session.pop('cart', None)
     session.pop('coupon', None)
-    
-    # Update coupon usage count
     if coupon:
         coupon_data = next((c for c in COUPONS if c['code'] == coupon['code']), None)
         if coupon_data:
             coupon_data['used_count'] += 1
-    
     flash(f'Thank you {name}! Your order #{order["order_number"]} has been placed successfully.', 'success')
     return redirect(url_for('order_detail', order_id=order['id']))
 
@@ -495,7 +460,6 @@ def orders():
     if 'user' not in session:
         flash('Please login to view your orders', 'warning')
         return redirect(url_for('login'))
-    
     user_email = session['user']
     user_orders = [o for o in ORDERS if o['customer_email'] == user_email]
     user_orders.sort(key=lambda x: x['created_at'], reverse=True)
@@ -506,16 +470,13 @@ def order_detail(order_id):
     if 'user' not in session:
         flash('Please login to view order', 'warning')
         return redirect(url_for('login'))
-    
     order = next((o for o in ORDERS if o['id'] == order_id), None)
     if not order:
         flash('Order not found', 'danger')
         return redirect(url_for('orders'))
-    
     if order['customer_email'] != session['user'] and not session.get('is_admin'):
         flash('Access denied', 'danger')
         return redirect(url_for('orders'))
-    
     return render_template('order_detail.html', order=order)
 
 # ==================== AUTH ROUTES ====================
@@ -525,7 +486,6 @@ def login():
     if request.method == 'POST':
         email = request.form.get('email')
         password = request.form.get('password')
-        
         user = next((u for u in USERS if u['email'] == email), None)
         if user and user.get('password') == password:
             session['user'] = email
@@ -541,7 +501,6 @@ def login():
             return redirect(url_for('admin_dashboard'))
         else:
             flash('Invalid email or password', 'danger')
-    
     return render_template('login.html')
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -550,11 +509,9 @@ def register():
         name = request.form.get('name')
         email = request.form.get('email')
         password = request.form.get('password')
-        
         if any(u['email'] == email for u in USERS):
             flash('Email already registered', 'danger')
             return redirect(url_for('register'))
-        
         USERS.append({
             'id': len(USERS) + 1,
             'name': name,
@@ -563,12 +520,10 @@ def register():
             'is_admin': False,
             'created_at': datetime.now().isoformat()
         })
-        
         session['user'] = email
         session['user_name'] = name
         flash(f'Account created! Welcome {name}!', 'success')
         return redirect(url_for('home'))
-    
     return render_template('register.html')
 
 @app.route('/logout')
@@ -582,17 +537,35 @@ def profile():
     if 'user' not in session:
         flash('Please login to view profile', 'warning')
         return redirect(url_for('login'))
-    
     user = next((u for u in USERS if u['email'] == session['user']), None)
-    
-    if request.method == 'POST':
-        if user:
-            user['name'] = request.form.get('name')
-            user['phone'] = request.form.get('phone')
-            user['address'] = request.form.get('address')
-            flash('Profile updated successfully!', 'success')
-    
+    if request.method == 'POST' and user:
+        user['name'] = request.form.get('name')
+        user['phone'] = request.form.get('phone')
+        user['address'] = request.form.get('address')
+        user['city'] = request.form.get('city')
+        user['state'] = request.form.get('state')
+        flash('Profile updated successfully!', 'success')
+        return redirect(url_for('profile'))
     return render_template('profile.html', user=user)
+
+@app.route('/order/<int:order_id>/cancel', methods=['POST'])
+def cancel_order(order_id):
+    if 'user' not in session:
+        flash('Please login to cancel order', 'warning')
+        return redirect(url_for('login'))
+    order = next((o for o in ORDERS if o['id'] == order_id), None)
+    if not order:
+        flash('Order not found', 'danger')
+        return redirect(url_for('orders'))
+    if order['customer_email'] != session['user']:
+        flash('Access denied', 'danger')
+        return redirect(url_for('orders'))
+    if order['status'] not in ['pending', 'processing']:
+        flash('This order cannot be cancelled', 'warning')
+        return redirect(url_for('order_detail', order_id=order_id))
+    order['status'] = 'cancelled'
+    flash('Order cancelled successfully!', 'success')
+    return redirect(url_for('order_detail', order_id=order_id))
 
 # ==================== ADMIN ROUTES ====================
 
@@ -602,27 +575,21 @@ def admin_dashboard():
         flash('Admin access required', 'danger')
         return redirect(url_for('home'))
     
-    # Calculate stats
-    total_sales = sum(o['total_amount'] for o in ORDERS)
+    total_sales = sum(o['total_amount'] for o in ORDERS) if ORDERS else 0
     total_orders = len(ORDERS)
     total_customers = len(USERS)
     total_products = len(PRODUCTS)
     pending_reviews = len([r for r in REVIEWS if not r.get('approved', False)])
-    
-    # Low stock products
     low_stock = [p for p in PRODUCTS if p['stock'] < 10]
+    recent_orders = sorted(ORDERS, key=lambda x: x['created_at'], reverse=True)[:5] if ORDERS else []
     
-    # Recent orders
-    recent_orders = sorted(ORDERS, key=lambda x: x['created_at'], reverse=True)[:5]
-    
-    # Chart data for last 7 days
     chart_labels = []
     chart_data = []
     for i in range(6, -1, -1):
         date = datetime.now() - timedelta(days=i)
-        date_str = date.strftime('%Y-%m-%d')
         chart_labels.append(date.strftime('%a'))
-        daily_sales = sum(o['total_amount'] for o in ORDERS if o.get('created_at', '')[:10] == date_str)
+        date_str = date.strftime('%Y-%m-%d')
+        daily_sales = sum(o['total_amount'] for o in ORDERS if o.get('created_at', '')[:10] == date_str) if ORDERS else 0
         chart_data.append(daily_sales)
     
     return render_template('admin/dashboard.html', 
@@ -635,50 +602,6 @@ def admin_dashboard():
                          recent_orders=recent_orders,
                          chart_labels=chart_labels,
                          chart_data=chart_data)
-    
-@app.route('/admin/bulk-import')
-def bulk_import():
-    if not session.get('is_admin'):
-        flash('Admin access required', 'danger')
-        return redirect(url_for('home'))
-    return render_template('admin/bulk_import.html')
-
-@app.route('/admin/products/import', methods=['POST'])
-def import_products_csv():
-    if not session.get('is_admin'):
-        return redirect(url_for('home'))
-    
-    file = request.files.get('csv_file')
-    if not file:
-        flash('No file uploaded', 'danger')
-        return redirect(url_for('bulk_import'))
-    
-    import csv
-    import io
-    content = file.stream.read().decode('utf-8')
-    csv_reader = csv.DictReader(io.StringIO(content))
-    
-    imported = 0
-    for row in csv_reader:
-        product = {
-            'id': len(PRODUCTS) + 1 + imported,
-            'name': row.get('name'),
-            'sku': row.get('sku'),
-            'price': float(row.get('price', 0)),
-            'stock': int(row.get('stock', 0)),
-            'description': row.get('description', ''),
-            'category': row.get('category', 'Utensils'),
-            'image': 'utensil',
-            'featured': False,
-            'bestseller': False,
-            'rating': 0,
-            'reviews': 0
-        }
-        PRODUCTS.append(product)
-        imported += 1
-    
-    flash(f'Imported {imported} products successfully!', 'success')
-    return redirect(url_for('admin_products'))
 
 @app.route('/admin/products')
 def admin_products():
@@ -692,7 +615,6 @@ def admin_add_product():
     if not session.get('is_admin'):
         flash('Admin access required', 'danger')
         return redirect(url_for('home'))
-    
     if request.method == 'POST':
         product = {
             'name': request.form.get('name'),
@@ -710,7 +632,6 @@ def admin_add_product():
         add_product(product)
         flash('Product added successfully!', 'success')
         return redirect(url_for('admin_products'))
-    
     return render_template('admin/add_product.html', categories=CATEGORIES)
 
 @app.route('/admin/products/edit/<int:product_id>', methods=['GET', 'POST'])
@@ -718,12 +639,10 @@ def admin_edit_product(product_id):
     if not session.get('is_admin'):
         flash('Admin access required', 'danger')
         return redirect(url_for('home'))
-    
     product = get_product(product_id)
     if not product:
         flash('Product not found', 'danger')
         return redirect(url_for('admin_products'))
-    
     if request.method == 'POST':
         update_product(product_id, {
             'name': request.form.get('name'),
@@ -738,14 +657,12 @@ def admin_edit_product(product_id):
         })
         flash('Product updated successfully!', 'success')
         return redirect(url_for('admin_products'))
-    
     return render_template('admin/edit_product.html', product=product, categories=CATEGORIES)
 
 @app.route('/admin/products/delete/<int:product_id>', methods=['POST'])
 def admin_delete_product(product_id):
     if not session.get('is_admin'):
         return jsonify({'success': False}), 403
-    
     delete_product(product_id)
     flash('Product deleted', 'success')
     return redirect(url_for('admin_products'))
@@ -755,12 +672,10 @@ def admin_orders():
     if not session.get('is_admin'):
         flash('Admin access required', 'danger')
         return redirect(url_for('home'))
-    
     status_filter = request.args.get('status')
     orders = ORDERS
     if status_filter:
         orders = [o for o in orders if o['status'] == status_filter]
-    
     orders.sort(key=lambda x: x['created_at'], reverse=True)
     return render_template('admin/orders.html', orders=orders)
 
@@ -768,15 +683,12 @@ def admin_orders():
 def admin_update_order_status(order_id):
     if not session.get('is_admin'):
         return jsonify({'success': False}), 403
-    
     data = request.get_json()
     status = data.get('status')
-    
     order = next((o for o in ORDERS if o['id'] == order_id), None)
     if order:
         order['status'] = status
         return jsonify({'success': True})
-    
     return jsonify({'success': False}), 404
 
 @app.route('/admin/customers')
@@ -798,7 +710,6 @@ def admin_add_coupon():
     if not session.get('is_admin'):
         flash('Admin access required', 'danger')
         return redirect(url_for('home'))
-    
     coupon = {
         'id': len(COUPONS) + 1,
         'code': request.form.get('code').upper(),
@@ -820,7 +731,6 @@ def admin_add_coupon():
 def admin_toggle_coupon(coupon_id):
     if not session.get('is_admin'):
         return jsonify({'success': False}), 403
-    
     coupon = next((c for c in COUPONS if c['id'] == coupon_id), None)
     if coupon:
         coupon['active'] = not coupon['active']
@@ -832,55 +742,17 @@ def admin_reviews():
     if not session.get('is_admin'):
         flash('Admin access required', 'danger')
         return redirect(url_for('home'))
-    
     pending = [r for r in REVIEWS if not r.get('approved', False)]
     approved = [r for r in REVIEWS if r.get('approved', False)]
     return render_template('admin/reviews.html', pending_reviews=pending, approved_reviews=approved)
-
-@app.route('/api/chat/send', methods=['POST'])
-def chat_send():
-    data = request.get_json()
-    session_id = data.get('session_id', 'default')
-    message = data.get('message')
-    
-    if session_id not in chat_sessions:
-        chat_sessions[session_id] = []
-    
-    chat_sessions[session_id].append({
-        'sender': 'user',
-        'message': message,
-        'time': datetime.now().isoformat()
-    })
-    
-    return jsonify({'success': True})
-@app.route('/admin/reports')
-def admin_reports():
-    if not session.get('is_admin'):
-        flash('Admin access required', 'danger')
-        return redirect(url_for('home'))
-    
-    # Sales report data
-    sales_by_day = {}
-    for order in ORDERS:
-        date = order['created_at'][:10]
-        sales_by_day[date] = sales_by_day.get(date, 0) + order['total_amount']
-    
-    return render_template('admin/reports.html', sales_by_day=sales_by_day)
-
-@app.route('/api/chat/messages/<session_id>')
-def chat_messages(session_id):
-    messages = chat_sessions.get(session_id, [])
-    return jsonify({'messages': messages})
 
 @app.route('/admin/reviews/approve/<int:review_id>', methods=['POST'])
 def admin_approve_review(review_id):
     if not session.get('is_admin'):
         return jsonify({'success': False}), 403
-    
     review = next((r for r in REVIEWS if r['id'] == review_id), None)
     if review:
         review['approved'] = True
-        # Update product rating
         product = get_product(review['product_id'])
         if product:
             product_reviews = [r for r in REVIEWS if r['product_id'] == review['product_id'] and r.get('approved', False)]
@@ -894,7 +766,6 @@ def admin_approve_review(review_id):
 def admin_delete_review(review_id):
     if not session.get('is_admin'):
         return jsonify({'success': False}), 403
-    
     global REVIEWS
     REVIEWS = [r for r in REVIEWS if r['id'] != review_id]
     return jsonify({'success': True})
@@ -906,25 +777,46 @@ def admin_newsletter():
         return redirect(url_for('home'))
     return render_template('admin/newsletter.html', subscribers=NEWSLETTER_SUBSCRIBERS)
 
-
 @app.route('/admin/send-newsletter', methods=['POST'])
-def send_newsletter():
+def send_newsletter_route():
     if not session.get('is_admin'):
+        flash('Admin access required', 'danger')
         return redirect(url_for('home'))
     subject = request.form.get('subject')
-    message = request.form.get('message')
+    content = request.form.get('message')
+    for subscriber in NEWSLETTER_SUBSCRIBERS:
+        try:
+            print(f"Sending to {subscriber}: {subject}")
+        except Exception as e:
+            print(f"Failed: {e}")
     flash(f'Newsletter "{subject}" sent to {len(NEWSLETTER_SUBSCRIBERS)} subscribers!', 'success')
     return redirect(url_for('admin_newsletter'))
 
-# Export routes
+@app.route('/admin/bulk-import')
+def bulk_import():
+    if not session.get('is_admin'):
+        flash('Admin access required', 'danger')
+        return redirect(url_for('home'))
+    return render_template('admin/bulk_import.html')
+
+@app.route('/admin/export-products')
+def admin_export_products():
+    if not session.get('is_admin'):
+        flash('Admin access required', 'danger')
+        return redirect(url_for('home'))
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(['ID', 'Name', 'Category', 'Price', 'Stock', 'Description'])
+    for p in PRODUCTS:
+        writer.writerow([p['id'], p['name'], p['category'], p['price'], p['stock'], p['description']])
+    output.seek(0)
+    return send_file(io.BytesIO(output.getvalue().encode('utf-8')), mimetype='text/csv', as_attachment=True, download_name='products_export.csv')
+
 @app.route('/admin/export-orders')
 def export_orders():
     if not session.get('is_admin'):
         flash('Admin access required', 'danger')
         return redirect(url_for('home'))
-    
-    import csv
-    import io
     output = io.StringIO()
     writer = csv.writer(output)
     writer.writerow(['Order #', 'Customer', 'Email', 'Total', 'Status', 'Date'])
@@ -938,9 +830,6 @@ def export_customers():
     if not session.get('is_admin'):
         flash('Admin access required', 'danger')
         return redirect(url_for('home'))
-    
-    import csv
-    import io
     output = io.StringIO()
     writer = csv.writer(output)
     writer.writerow(['Email', 'Name', 'Joined'])
@@ -949,20 +838,76 @@ def export_customers():
     output.seek(0)
     return send_file(io.BytesIO(output.getvalue().encode('utf-8')), mimetype='text/csv', as_attachment=True, download_name='customers_export.csv')
 
-@app.route('/admin/export-products')
-def admin_export_products():
+@app.route('/admin/remove-subscriber/<email>', methods=['POST'])
+def remove_subscriber(email):
+    if not session.get('is_admin'):
+        return jsonify({'success': False})
+    if email in NEWSLETTER_SUBSCRIBERS:
+        NEWSLETTER_SUBSCRIBERS.remove(email)
+    return jsonify({'success': True})
+
+@app.route('/admin/products/import', methods=['POST'])
+def import_products_csv():
+    if not session.get('is_admin'):
+        return redirect(url_for('home'))
+    file = request.files.get('csv_file')
+    if not file:
+        flash('No file uploaded', 'danger')
+        return redirect(url_for('bulk_import'))
+    import csv
+    import io
+    content = file.stream.read().decode('utf-8')
+    csv_reader = csv.DictReader(io.StringIO(content))
+    imported = 0
+    for row in csv_reader:
+        product = {
+            'id': len(PRODUCTS) + 1 + imported,
+            'name': row.get('name'),
+            'sku': row.get('sku'),
+            'price': float(row.get('price', 0)),
+            'stock': int(row.get('stock', 0)),
+            'description': row.get('description', ''),
+            'category': row.get('category', 'Utensils'),
+            'image': 'utensil',
+            'featured': False,
+            'bestseller': False,
+            'rating': 0,
+            'reviews': 0
+        }
+        PRODUCTS.append(product)
+        imported += 1
+    flash(f'Imported {imported} products successfully!', 'success')
+    return redirect(url_for('admin_products'))
+
+@app.route('/api/chat/send', methods=['POST'])
+def chat_send():
+    data = request.get_json()
+    session_id = data.get('session_id', 'default')
+    message = data.get('message')
+    if session_id not in chat_sessions:
+        chat_sessions[session_id] = []
+    chat_sessions[session_id].append({
+        'sender': 'user',
+        'message': message,
+        'time': datetime.now().isoformat()
+    })
+    return jsonify({'success': True})
+
+@app.route('/api/chat/messages/<session_id>')
+def chat_messages(session_id):
+    messages = chat_sessions.get(session_id, [])
+    return jsonify({'messages': messages})
+
+@app.route('/admin/reports')
+def admin_reports():
     if not session.get('is_admin'):
         flash('Admin access required', 'danger')
         return redirect(url_for('home'))
-    
-    output = io.StringIO()
-    writer = csv.writer(output)
-    writer.writerow(['ID', 'Name', 'Category', 'Price', 'Stock', 'Description'])
-    for p in PRODUCTS:
-        writer.writerow([p['id'], p['name'], p['category'], p['price'], p['stock'], p['description']])
-    
-    output.seek(0)
-    return send_file(io.BytesIO(output.getvalue().encode('utf-8')), mimetype='text/csv', as_attachment=True, download_name='products_export.csv')
+    sales_by_day = {}
+    for order in ORDERS:
+        date = order['created_at'][:10]
+        sales_by_day[date] = sales_by_day.get(date, 0) + order['total_amount']
+    return render_template('admin/reports.html', sales_by_day=sales_by_day)
 
 @app.route('/health')
 def health():

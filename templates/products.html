@@ -3,90 +3,350 @@
 {% block title %}Shop - Golden Kitchen Nigeria{% endblock %}
 
 {% block content %}
+<!-- Shop Hero Banner with Video -->
+<section style="position: relative; background: linear-gradient(135deg, var(--dark) 0%, #2D2D2D 100%); padding: 60px 0; overflow: hidden;">
+    <!-- Background Video -->
+    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;">
+        <video autoplay muted loop playsinline style="width: 100%; height: 100%; object-fit: cover; opacity: 0.3;">
+            <source src="https://cdn.pixabay.com/video/2023/02/01/148481-791778886_large.mp4" type="video/mp4">
+        </video>
+        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(0,0,0,0.7), rgba(0,0,0,0.5));"></div>
+    </div>
+    <div class="container text-center" style="position: relative; z-index: 2;">
+        <h1 class="display-4 fw-bold" style="color: white; font-family: 'Cormorant Garamond', serif;">
+            Premium Cookware <span style="color: var(--primary);">Collection</span>
+        </h1>
+        <p style="color: rgba(255,255,255,0.9); font-size: 1.1rem; max-width: 600px; margin: 1rem auto 0;">Discover our curated selection of high-quality kitchen essentials</p>
+    </div>
+</section>
+
 <div class="container my-5">
     <div class="row">
         <!-- Sidebar Filters -->
         <div class="col-lg-3 mb-4">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <h5>Categories</h5>
-                    <div class="list-group list-group-flush">
-                        <a href="/products" class="list-group-item list-group-item-action {% if not current_category %}active{% endif %}" style="border: none;">
-                            All Products
+            <!-- Categories Card -->
+            <div class="card border-0 shadow-sm rounded-4" data-aos="fade-right">
+                <div class="card-body p-0">
+                    <div class="p-3 border-bottom" style="background: var(--gray-light); border-radius: 12px 12px 0 0;">
+                        <h5 class="mb-0" style="font-weight: 700;">
+                            <i class="fas fa-tags me-2" style="color: var(--primary);"></i>Categories
+                        </h5>
+                    </div>
+                    <div class="list-group list-group-flush p-2">
+                        <a href="/products" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center {% if not current_category %}active-category{% endif %}" style="border: none; border-radius: 8px; margin-bottom: 4px; transition: all 0.2s;">
+                            <span><i class="fas fa-th-large me-2"></i>All Products</span>
+                            <span class="badge" style="background: var(--primary-light); color: white;">{{ products|length }}</span>
                         </a>
                         {% for cat in categories %}
-                        <a href="/products?category={{ cat.name }}" class="list-group-item list-group-item-action {% if current_category == cat.name %}active{% endif %}" style="border: none;">
-                            {{ cat.name }} <span class="badge bg-secondary float-end">{{ cat.count }}</span>
+                        <a href="/products?category={{ cat.name }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center {% if current_category == cat.name %}active-category{% endif %}" style="border: none; border-radius: 8px; margin-bottom: 4px; transition: all 0.2s;">
+                            <i class="fas fa-{{ cat.icon }} me-2" style="width: 20px;"></i>{{ cat.name }}
+                            <span class="badge" style="background: var(--primary-light); color: white;">{{ cat.count }}</span>
                         </a>
                         {% endfor %}
                     </div>
                 </div>
             </div>
             
-            <div class="card border-0 shadow-sm mt-4">
+            <!-- Sort & Filter Card -->
+            <div class="card border-0 shadow-sm mt-4 rounded-4" data-aos="fade-right" data-aos-delay="100">
                 <div class="card-body">
-                    <h5>Sort By</h5>
-                    <select class="form-select" id="sortSelect" onchange="applySort()">
-                        <option value="">Default</option>
-                        <option value="price_asc">Price: Low to High</option>
-                        <option value="price_desc">Price: High to Low</option>
-                        <option value="rating">Highest Rated</option>
-                        <option value="bestseller">Best Sellers</option>
-                    </select>
+                    <h5 class="mb-3" style="font-weight: 700;">
+                        <i class="fas fa-filter me-2" style="color: var(--primary);"></i>Sort & Filter
+                    </h5>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Sort By</label>
+                        <select class="form-select" id="sortSelect" onchange="applySort()" style="border-radius: 10px; border-color: var(--border);">
+                            <option value="">Default</option>
+                            <option value="price_asc">💰 Price: Low to High</option>
+                            <option value="price_desc">💰 Price: High to Low</option>
+                            <option value="rating">⭐ Highest Rated</option>
+                            <option value="bestseller">🔥 Best Sellers</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Price Range</label>
+                        <div class="d-flex gap-2">
+                            <input type="number" class="form-control" placeholder="Min" id="minPrice" style="border-radius: 8px;">
+                            <span class="align-self-center">-</span>
+                            <input type="number" class="form-control" placeholder="Max" id="maxPrice" style="border-radius: 8px;">
+                        </div>
+                    </div>
+                    <button class="btn btn-primary-custom w-100" onclick="applyPriceFilter()">
+                        <i class="fas fa-search me-2"></i>Apply Filters
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Featured Video Card -->
+            <div class="card border-0 shadow-sm mt-4 rounded-4 overflow-hidden" data-aos="fade-right" data-aos-delay="200">
+                <div style="position: relative;">
+                    <video autoplay muted loop playsinline style="width: 100%; height: 140px; object-fit: cover;">
+                        <source src="https://cdn.pixabay.com/video/2019/09/19/25716-361896455_large.mp4" type="video/mp4">
+                    </video>
+                    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, rgba(198,164,63,0.8), rgba(0,0,0,0.6)); display: flex; align-items: center; justify-content: center; flex-direction: column;">
+                        <i class="fas fa-gem" style="font-size: 30px; color: white; margin-bottom: 8px;"></i>
+                        <p class="text-white text-center mb-0 small px-2">Premium Quality Guaranteed</p>
+                    </div>
                 </div>
             </div>
         </div>
         
         <!-- Products Grid -->
         <div class="col-lg-9">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h3>All Products</h3>
-                <p class="text-muted mb-0">{{ products|length }} products found</p>
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2" data-aos="fade-up">
+                <h3 style="font-family: 'Cormorant Garamond', serif; font-weight: 700;">
+                    <i class="fas fa-store me-2" style="color: var(--primary);"></i>All Products
+                </h3>
+                <div class="d-flex align-items-center gap-3">
+                    <p class="text-muted mb-0">
+                        <i class="fas fa-box me-1"></i>{{ products|length }} products found
+                    </p>
+                    <div class="dropdown">
+                        <button class="btn btn-outline-custom btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-eye me-1"></i>View
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#" onclick="changeView('grid')"><i class="fas fa-th me-2"></i>Grid View</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="changeView('list')"><i class="fas fa-list me-2"></i>List View</a></li>
+                        </ul>
+                    </div>
+                </div>
             </div>
             
-            <div class="row g-4">
+            <!-- Products Grid -->
+            <div class="row g-4" id="productsContainer">
                 {% for product in products %}
-                <div class="col-md-4">
-                    <div class="card h-100 border-0 shadow-sm hover-card">
-                        <div class="card-body text-center">
+                <div class="col-md-6 col-xl-4 product-item" data-price="{{ product.price }}" data-aos="fade-up" data-aos-delay="{{ loop.index * 50 }}">
+                    <div class="product-card position-relative">
+                        <!-- Badges -->
+                        <div class="position-absolute top-0 start-0 m-2 z-1 d-flex gap-1 flex-column">
                             {% if product.bestseller %}
-                                <span class="badge bg-warning position-absolute top-0 start-0 m-2">Best Seller</span>
+                                <span style="background: linear-gradient(135deg, #FFD700, #FFA500); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.65rem; font-weight: 600;">
+                                    🔥 Best Seller
+                                </span>
                             {% endif %}
                             {% if product.compare_price %}
-                                <span class="badge bg-danger position-absolute top-0 end-0 m-2">Sale</span>
+                                <span style="background: var(--primary); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.65rem; font-weight: 600;">
+                                    Sale {{ ((product.compare_price - product.price) / product.compare_price * 100)|round|int }}% OFF
+                                </span>
                             {% endif %}
-                            <div class="product-image my-3">
-                                <i class="fas fa-{{ product.image }} fa-4x" style="color: #E67E22;"></i>
+                        </div>
+                        
+                        <!-- Quick View Button -->
+                        <button class="btn btn-sm quick-view-btn" onclick="quickView({{ product.id }})" style="position: absolute; top: 10px; right: 10px; background: white; border-radius: 50%; width: 35px; height: 35px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 2;">
+                            <i class="fas fa-eye" style="color: var(--primary);"></i>
+                        </button>
+                        
+                        <div class="product-image" style="position: relative; cursor: pointer;" onclick="location.href='/product/{{ product.id }}'">
+                            <i class="fas fa-{{ product.image }} fa-4x"></i>
+                            <!-- Hover overlay -->
+                            <div class="image-hover-overlay">
+                                <i class="fas fa-search-plus"></i>
+                                <span>Quick View</span>
                             </div>
-                            <h5 class="card-title">{{ product.name }}</h5>
-                            <div class="mb-2">
-                                <i class="fas fa-star text-warning"></i>
-                                <span>{{ product.rating }}</span>
-                                <span class="text-muted">({{ product.reviews }} reviews)</span>
+                        </div>
+                        <div class="p-3">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h5 class="card-title mb-0" style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 600; font-size: 1rem;">
+                                    {{ product.name }}
+                                </h5>
                             </div>
+                            
+                            <!-- Rating Stars -->
                             <div class="mb-2">
+                                {% set full_stars = (product.rating|default(4.5)|round(0, 'floor')|int) %}
+                                {% set half_star = (product.rating|default(4.5) - full_stars) >= 0.5 %}
+                                {% for i in range(5) %}
+                                    {% if i < full_stars %}
+                                        <i class="fas fa-star" style="color: #FFD700; font-size: 0.8rem;"></i>
+                                    {% elif half_star and i == full_stars %}
+                                        <i class="fas fa-star-half-alt" style="color: #FFD700; font-size: 0.8rem;"></i>
+                                    {% else %}
+                                        <i class="far fa-star" style="color: #FFD700; font-size: 0.8rem;"></i>
+                                    {% endif %}
+                                {% endfor %}
+                                <span class="text-muted small ms-1">({{ product.reviews|default(24) }})</span>
+                            </div>
+                            
+                            <!-- Price -->
+                            <div class="mb-3">
                                 {% if product.compare_price %}
-                                    <span class="text-muted text-decoration-line-through me-2">₦{{ "{:,.0f}".format(product.compare_price) }}</span>
+                                    <span class="text-muted text-decoration-line-through me-2" style="font-size: 0.85rem;">₦{{ "{:,.0f}".format(product.compare_price) }}</span>
                                 {% endif %}
-                                <span class="fw-bold fs-5" style="color: #E67E22;">₦{{ "{:,.0f}".format(product.price) }}</span>
+                                <span class="fw-bold fs-4" style="color: var(--primary);">₦{{ "{:,.0f}".format(product.price) }}</span>
                             </div>
+                            
+                            <!-- Buttons -->
                             <div class="d-flex gap-2">
-                                <button class="btn btn-terracotta flex-grow-1" onclick="addToCart({{ product.id }})">
-                                    <i class="fas fa-shopping-cart"></i> Add
+                                <button class="btn btn-primary-custom flex-grow-1" onclick="addToCart({{ product.id }})" style="padding: 0.6rem;">
+                                    <i class="fas fa-shopping-cart me-1"></i> Add to Cart
                                 </button>
-                                <button class="btn btn-outline-terracotta" onclick="addToWishlist({{ product.id }})">
+                                <button class="btn btn-outline-custom" onclick="addToWishlist({{ product.id }})" style="padding: 0.6rem 1rem;">
                                     <i class="fas fa-heart"></i>
                                 </button>
                             </div>
-                            <a href="/product/{{ product.id }}" class="btn btn-link btn-sm mt-2">View Details</a>
                         </div>
                     </div>
                 </div>
                 {% endfor %}
             </div>
+            
+            <!-- No Results Message -->
+            <div id="noResults" class="text-center py-5" style="display: none;">
+                <i class="fas fa-search" style="font-size: 60px; color: var(--gray); margin-bottom: 1rem;"></i>
+                <h4>No products found</h4>
+                <p class="text-muted">Try adjusting your filters or browse all products</p>
+                <button class="btn btn-primary-custom" onclick="resetFilters()">Reset Filters</button>
+            </div>
+            
+            <!-- Pagination -->
+            <div class="d-flex justify-content-center mt-5">
+                <nav>
+                    <ul class="pagination">
+                        <li class="page-item disabled"><a class="page-link" href="#" style="border-radius: 10px 0 0 10px;"><i class="fas fa-chevron-left"></i></a></li>
+                        <li class="page-item active"><a class="page-link" href="#" style="background: var(--primary); border-color: var(--primary); border-radius: 8px; margin: 0 4px;">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#" style="border-radius: 8px; margin: 0 4px;">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#" style="border-radius: 8px; margin: 0 4px;">3</a></li>
+                        <li class="page-item"><a class="page-link" href="#" style="border-radius: 8px; margin: 0 4px;">4</a></li>
+                        <li class="page-item"><a class="page-link" href="#" style="border-radius: 0 10px 10px 0;"><i class="fas fa-chevron-right"></i></a></li>
+                    </ul>
+                </nav>
+            </div>
         </div>
     </div>
 </div>
+
+<!-- Quick View Modal -->
+<div class="modal fade" id="quickViewModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 20px; overflow: hidden;">
+            <div class="modal-body p-0">
+                <div id="quickViewContent"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Category Active State */
+    .active-category {
+        background: var(--primary) !important;
+        color: white !important;
+    }
+    .active-category .badge {
+        background: white !important;
+        color: var(--primary) !important;
+    }
+    
+    /* Product Card Enhancements */
+    .product-card {
+        transition: all 0.3s ease;
+        border-radius: 20px;
+        overflow: hidden;
+    }
+    
+    .product-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    }
+    
+    .product-image {
+        position: relative;
+        height: 200px;
+        background: linear-gradient(135deg, #FFF9F0, #FFF5E6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        cursor: pointer;
+    }
+    
+    .image-hover-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        color: white;
+    }
+    
+    .product-image:hover .image-hover-overlay {
+        opacity: 1;
+    }
+    
+    .image-hover-overlay i {
+        font-size: 30px;
+        color: var(--primary);
+    }
+    
+    .image-hover-overlay span {
+        font-size: 12px;
+        font-weight: 500;
+    }
+    
+    .quick-view-btn {
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .product-card:hover .quick-view-btn {
+        opacity: 1;
+    }
+    
+    /* List View Styles */
+    .list-view .product-item {
+        width: 100%;
+    }
+    
+    .list-view .product-card {
+        display: flex;
+        flex-direction: row;
+    }
+    
+    .list-view .product-image {
+        width: 200px;
+        height: 200px;
+        flex-shrink: 0;
+    }
+    
+    .list-view .p-3 {
+        flex: 1;
+    }
+    
+    @media (max-width: 768px) {
+        .list-view .product-card {
+            flex-direction: column;
+        }
+        .list-view .product-image {
+            width: 100%;
+        }
+    }
+    
+    /* Pagination Styling */
+    .page-link {
+        color: var(--dark);
+        border: 1px solid var(--border);
+        padding: 8px 14px;
+    }
+    
+    .page-link:hover {
+        color: var(--primary);
+        border-color: var(--primary);
+    }
+    
+    .page-item.active .page-link {
+        background: var(--primary);
+        border-color: var(--primary);
+    }
+</style>
 
 <script>
 function applySort() {
@@ -99,11 +359,103 @@ function applySort() {
     }
     window.location.href = url.toString();
 }
-</script>
 
-<style>
-.hover-card { transition: all 0.3s; }
-.hover-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important; }
-.list-group-item.active { background: #E67E22; border-color: #E67E22; }
-</style>
+function applyPriceFilter() {
+    const minPrice = document.getElementById('minPrice').value;
+    const maxPrice = document.getElementById('maxPrice').value;
+    const items = document.querySelectorAll('.product-item');
+    let visibleCount = 0;
+    
+    items.forEach(item => {
+        const price = parseFloat(item.dataset.price);
+        let show = true;
+        if (minPrice && price < parseFloat(minPrice)) show = false;
+        if (maxPrice && price > parseFloat(maxPrice)) show = false;
+        item.style.display = show ? '' : 'none';
+        if (show) visibleCount++;
+    });
+    
+    document.getElementById('noResults').style.display = visibleCount === 0 ? 'block' : 'none';
+}
+
+function resetFilters() {
+    document.getElementById('minPrice').value = '';
+    document.getElementById('maxPrice').value = '';
+    const items = document.querySelectorAll('.product-item');
+    items.forEach(item => item.style.display = '');
+    document.getElementById('noResults').style.display = 'none';
+}
+
+function changeView(view) {
+    const container = document.getElementById('productsContainer');
+    if (view === 'list') {
+        container.classList.add('list-view');
+        container.classList.remove('row');
+    } else {
+        container.classList.remove('list-view');
+        container.classList.add('row');
+    }
+}
+
+function quickView(productId) {
+    // Fetch product details and show modal
+    const modal = new bootstrap.Modal(document.getElementById('quickViewModal'));
+    const content = document.getElementById('quickViewContent');
+    content.innerHTML = `
+        <div class="text-center p-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-3">Loading product details...</p>
+        </div>
+    `;
+    modal.show();
+    
+    // Simulate loading (replace with actual fetch)
+    setTimeout(() => {
+        content.innerHTML = `
+            <div class="row g-0">
+                <div class="col-md-6" style="background: var(--gray-light); min-height: 300px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-utensils" style="font-size: 120px; color: var(--primary);"></i>
+                </div>
+                <div class="col-md-6 p-4">
+                    <h3>Premium Product</h3>
+                    <div class="mb-2">
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="fas fa-star-half-alt text-warning"></i>
+                        <span class="text-muted ms-2">(45 reviews)</span>
+                    </div>
+                    <p class="text-muted">This premium quality kitchen utensil is designed for professional chefs and home cooks alike. Made with high-grade materials for durability and performance.</p>
+                    <div class="mb-3">
+                        <span class="fw-bold fs-3" style="color: var(--primary);">₦15,000</span>
+                        <span class="text-muted text-decoration-line-through ms-2">₦20,000</span>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-primary-custom flex-grow-1" onclick="addToCart(${productId}); bootstrap.Modal.getInstance(document.getElementById('quickViewModal')).hide();">
+                            Add to Cart
+                        </button>
+                        <button class="btn btn-outline-custom" onclick="addToWishlist(${productId})">
+                            <i class="fas fa-heart"></i> Wishlist
+                        </button>
+                    </div>
+                    <button class="btn btn-link mt-3" onclick="location.href='/product/${productId}'">View Full Details →</button>
+                </div>
+            </div>
+        `;
+    }, 500);
+}
+
+// Preserve sort parameter from URL
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const sortValue = urlParams.get('sort');
+    if (sortValue) {
+        const select = document.getElementById('sortSelect');
+        if (select) select.value = sortValue;
+    }
+});
+</script>
 {% endblock %}
