@@ -1,0 +1,25 @@
+﻿# Python cache
+__pycache__/
+*.py[cod]
+*.pyc
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Database
+instance/
+*.db
+*.sqlite
+
+# Vercel
+.vercel/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
