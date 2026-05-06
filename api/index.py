@@ -4,7 +4,8 @@ from flask_login import LoginManager, current_user, login_user, logout_user, log
 from flask_mail import Mail, Message
 from datetime import datetime, timedelta
 from itsdangerous import URLSafeTimedSerializer
-from supabase import create_client, Client
+import requests
+import json
 import secrets
 import json
 import csv
@@ -15,19 +16,44 @@ import traceback
 app = Flask(__name__, template_folder='../templates')
 app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
 
-# ==================== SUPABASE CONFIGURATION ====================
+# ==================== SUPABASE CONFIGURATION (using requests) ====================
 SUPABASE_URL = os.environ.get('SUPABASE_URL', 'https://fendtnsspplwehzagdgj.supabase.co')
 SUPABASE_KEY = os.environ.get('SUPABASE_KEY', 'sb_publishable_7kx1UWYtb-UDbRtAKhVxUA_Mx-6l9fi')
 
-try:
-    supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
-    print("✅ Supabase connected successfully!")
-except Exception as e:
-    print(f"❌ Supabase connection error: {e}")
-    supabase = None
+def supabase_request(method, endpoint, data=None):
+    """Make a request to Supabase REST API"""
+    url = f"{SUPABASE_URL}/rest/v1/{endpoint}"
+    headers = {
+        'apikey': SUPABASE_KEY,
+        'Authorization': f'Bearer {SUPABASE_KEY}',
+        'Content-Type': 'application/json'
+    }
+    
+    try:
+        if method == 'GET':
+            response = requests.get(url, headers=headers)
+        elif method == 'POST':
+            response = requests.post(url, headers=headers, json=data)
+        elif method == 'PUT':
+            response = requests.put(url, headers=headers, json=data)
+        elif method == 'PATCH':
+            response = requests.patch(url, headers=headers, json=data)
+        elif method == 'DELETE':
+            response = requests.delete(url, headers=headers)
+        else:
+            return None
+        
+        if response.status_code in [200, 201]:
+            return response.json()
+        else:
+            print(f"Supabase error: {response.status_code} - {response.text}")
+            return None
+    except Exception as e:
+        print(f"Request error: {e}")
+        return None
 
-# Initialize serializer for email tokens
-serializer = URLSafeTimedSerializer(app.secret_key)
+# Set supabase to True to indicate we have API access
+supabase = True  # This tells the app we have API access
 
 # ==================== EMAIL CONFIGURATION ====================
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
