@@ -1,8 +1,7 @@
-import sys
 import os
 
 # Add the parent directory to path
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 
 from flask import Flask, render_template, request, session, redirect, url_for, flash, jsonify, send_file
 from flask_login import LoginManager, current_user, login_user, logout_user, login_required
@@ -17,6 +16,17 @@ import io
 # Create Flask app
 app = Flask(__name__, template_folder='../templates')
 app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
+
+@app.route('/debug')
+def debug():
+    return jsonify({
+        "status": "ok",
+        "env_vars": {
+            "MAIL_USERNAME": bool(os.environ.get('MAIL_USERNAME')),
+            "MAIL_PASSWORD": bool(os.environ.get('MAIL_PASSWORD')),
+            "SECRET_KEY": bool(os.environ.get('SECRET_KEY'))
+        }
+    })
 
 # Initialize serializer for email tokens
 serializer = URLSafeTimedSerializer(app.secret_key)
