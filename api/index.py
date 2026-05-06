@@ -6,7 +6,9 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from flask import Flask, render_template, request, session, redirect, url_for, flash, jsonify, send_file
 from flask_login import LoginManager, current_user, login_user, logout_user, login_required
+from flask_mail import Mail, Message
 from datetime import datetime, timedelta
+from itsdangerous import URLSafeTimedSerializer
 import secrets
 import json
 import csv
@@ -16,15 +18,194 @@ import io
 app = Flask(__name__, template_folder='../templates')
 app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
 
-# Flask-Login setup
+# Initialize serializer for email tokens
+serializer = URLSafeTimedSerializer(app.secret_key)
+
+# ==================== EMAIL CONFIGURATION ====================
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
+app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_USERNAME')
+
+mail = Mail(app)
+
+# ==================== EMAIL FUNCTIONS ====================
+
+def send_verification_email(user_email, name, token):
+    """Send email verification link to customer"""
+    base_url = os.environ.get('BASE_URL', 'http://localhost:5000')
+    verification_link = f"{base_url}/verify-email/{token}"
+    
+    html = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <style>
+            body {{ font-family: Arial, sans-serif; }}
+            .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+            .header {{ background: #E67E22; color: white; padding: 20px; text-align: center; }}
+            .button {{ background: #E67E22; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block; }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header"><h2>Golden Kitchen Nigeria 🇳🇬</h2></div>
+            <div class="content">
+                <h3>Hello {name}!</h3>
+                <p>Please verify your email address to start shopping:</p>
+                <p style="text-align: center;">
+                    <a href="{verification_link}" class="button">Verify Email</a>
+                </p>
+                <p>Or copy this link: <br><small>{verification_link}</small></p>
+                <p>This link expires in 24 hours.</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    
+    try:
+        msg = Message("Verify Your Email - Golden Kitchen Nigeria", recipients=[user_email])
+        msg.html = html
+        mail.send(msg)
+        print(f"✅ Verification email sent to {user_email}")
+        return True
+    except Exception as e:
+        print(f"❌ Email error: {e}")
+        return False
+
+def send_welcome_email(user_email, name):
+    """Send welcome email after verification"""
+    base_url = os.environ.get('BASE_URL', 'http://localhost:5000')
+    shop_link = f"{base_url}/products"
+    
+    html = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <style>
+            body {{ font-family: Arial, sans-serif; }}
+            .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+            .header {{ background: #E67E22; color: white; padding: 20px; text-align: center; }}
+            .button {{ background: #E67E22; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block; }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h2>Welcome to Golden Kitchen Nigeria!</h2>
+            </div>
+            <div class="content">
+                <h3>Hello {name}!</h3>
+                <p>Thank you for verifying your email address.</p>
+                <p>Your account is now fully active and you can start shopping!</p>
+                <p style="text-align: center;">
+                    <a href="{shop_link}" class="button">Start Shopping</a>
+                </p>
+                <p>Use code <strong>WELCOME10</strong> for 10% off your first order! 🎉</p>
+                <br>
+                <p>Happy Cooking!<br>Golden Kitchen Nigeria Team 🇳🇬</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    
+    try:
+        msg = Message("Welcome to Golden Kitchen Nigeria! 🎉", recipients=[user_email])
+        msg.html = html
+        mail.send(msg)
+        print(f"✅ Welcome email sent to {user_email}")
+        return True
+    except Exception as e:
+        print(f"❌ Welcome email error: {e}")
+        return False
+
+def send_password_reset_email(user_email, token):
+    """Send password reset email"""
+    base_url = os.environ.get('BASE_URL', 'http://localhost:5000')
+    reset_link = f"{base_url}/reset-password/{token}"
+    
+    html = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <style>
+            body {{ font-family: Arial, sans-serif; }}
+            .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+            .header {{ background: #E67E22; color: white; padding: 20px; text-align: center; }}
+            .button {{ background: #E67E22; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block; }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header"><h2>Reset Your Password</h2></div>
+            <div class="content">
+                <p>Click below to reset your password:</p>
+                <p style="text-align: center;">
+                    <a href="{reset_link}" class="button">Reset Password</a>
+                </p>
+                <p>This link expires in 1 hour.</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    
+    try:
+        msg = Message("Reset Your Password - Golden Kitchen Nigeria", recipients=[user_email])
+        msg.html = html
+        mail.send(msg)
+        print(f"✅ Password reset email sent to {user_email}")
+        return True
+    except Exception as e:
+        print(f"❌ Email error: {e}")
+        return False
+
+def send_order_confirmation(order):
+    """Send order confirmation email"""
+    html = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <style>
+            body {{ font-family: Arial, sans-serif; }}
+            .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+            .header {{ background: #E67E22; color: white; padding: 20px; text-align: center; }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header"><h2>Order Confirmation #{order['order_number']}</h2></div>
+            <div class="content">
+                <p>Thank you for your order!</p>
+                <p><strong>Total:</strong> ₦{order['total_amount']:,.0f}</p>
+                <p><strong>Payment Method:</strong> {order['payment_method']}</p>
+                <p>We will notify you when your order ships.</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    
+    try:
+        msg = Message(f"Order Confirmation #{order['order_number']}", recipients=[order['customer_email']])
+        msg.html = html
+        mail.send(msg)
+        print(f"✅ Order confirmation sent to {order['customer_email']}")
+        return True
+    except Exception as e:
+        print(f"❌ Order email error: {e}")
+        return False
+
+# ==================== FLASK-LOGIN SETUP ====================
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
-
-# ... rest of your code
 login_manager.login_message = 'Please log in to access this page.'
 
-# User loader callback
 @login_manager.user_loader
 def load_user(user_id):
     # Since you're using in-memory USERS list
@@ -398,19 +579,18 @@ def subscribe_newsletter():
 
 @app.route('/checkout')
 def checkout():
-    if 'user' not in session:
-        flash('Please login to checkout', 'warning')
-        return redirect(url_for('login'))
     cart = session.get('cart', {})
     if not cart:
         flash('Your cart is empty', 'warning')
         return redirect(url_for('products'))
+    
     subtotal = calculate_cart_total(cart)
     coupon = session.get('coupon')
     discount = coupon.get('discount', 0) if coupon else 0
     total = subtotal - discount
     shipping = 0 if total >= 50000 else 2500
     final_total = total + shipping
+    
     return render_template('checkout.html', subtotal=subtotal, discount=discount, total=total, shipping=shipping, final_total=final_total)
 
 @app.route('/place-order', methods=['POST'])
@@ -452,6 +632,10 @@ def place_order():
         'created_at': datetime.now().isoformat()
     }
     ORDERS.append(order)
+    
+    # Send order confirmation email
+    send_order_confirmation(order)
+    
     session.pop('cart', None)
     session.pop('coupon', None)
     if coupon:
@@ -489,25 +673,98 @@ def order_detail(order_id):
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    # If already logged in, redirect to home
+    if session.get('user'):
+        return redirect(url_for('home'))
+    
     if request.method == 'POST':
         email = request.form.get('email')
         password = request.form.get('password')
-        user = next((u for u in USERS if u['email'] == email), None)
-        if user and user.get('password') == password:
-            session['user'] = email
-            session['user_name'] = user.get('name', email.split('@')[0])
-            session['is_admin'] = user.get('is_admin', False)
-            flash(f'Welcome back {session["user_name"]}!', 'success')
-            return redirect(url_for('home'))
-        elif email == 'admin@example.com' and password == 'admin123':
+        
+        # Check for admin
+        if email == 'admin@example.com' and password == 'admin123':
             session['user'] = email
             session['user_name'] = 'Admin'
             session['is_admin'] = True
             flash('Welcome Admin!', 'success')
             return redirect(url_for('admin_dashboard'))
-        else:
-            flash('Invalid email or password', 'danger')
+        
+        # Find user
+        user = next((u for u in USERS if u['email'] == email), None)
+        
+        if not user:
+            flash('Email not found. Please register.', 'danger')
+            return redirect(url_for('register'))
+        
+        # Check password
+        if user.get('password') != password:
+            flash('Invalid password.', 'danger')
+            return render_template('login.html')
+        
+        # Check if email is verified
+        if not user.get('is_verified', False):
+            flash('⚠️ Please verify your email before logging in.', 'warning')
+            flash('Check your inbox for the verification link.', 'info')
+            return redirect(url_for('resend_verification'))
+        
+        # Login successful
+        session['user'] = email
+        session['user_name'] = user.get('name', email.split('@')[0])
+        session['is_admin'] = user.get('is_admin', False)
+        flash(f'Welcome back {session["user_name"]}!', 'success')
+        return redirect(url_for('home'))
+    
     return render_template('login.html')
+
+@app.route('/resend-verification', methods=['GET', 'POST'])
+def resend_verification():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        
+        # Find user
+        user = next((u for u in USERS if u['email'] == email), None)
+        
+        if not user:
+            flash('Email not found. Please register first.', 'danger')
+            return redirect(url_for('register'))
+        
+        if user.get('is_verified', False):
+            flash('Email is already verified. You can login.', 'success')
+            return redirect(url_for('login'))
+        
+        # Generate new token and send email
+        token = serializer.dumps(email, salt='email-verify')
+        email_sent = send_verification_email(email, user.get('name', 'Customer'), token)
+        
+        if email_sent:
+            flash(f'✅ New verification link sent to {email}. Please check your inbox.', 'success')
+        else:
+            flash('❌ Failed to send email. Please try again.', 'danger')
+        
+        return redirect(url_for('login'))
+    
+    return render_template('resend_verification.html')
+
+def login_required_verified(f):
+    """Decorator to ensure user is logged in AND email verified"""
+    from functools import wraps
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user' not in session:
+            flash('Please login to access this page.', 'warning')
+            return redirect(url_for('login'))
+        
+        # Check if user is verified (skip for admin)
+        if not session.get('is_admin', False):
+            email = session['user']
+            user = next((u for u in USERS if u['email'] == email), None)
+            if user and not user.get('is_verified', False):
+                flash('Please verify your email before accessing this page.', 'warning')
+                return redirect(url_for('resend_verification'))
+        
+        return f(*args, **kwargs)
+    return decorated_function
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -515,22 +772,77 @@ def register():
         name = request.form.get('name')
         email = request.form.get('email')
         password = request.form.get('password')
-        if any(u['email'] == email for u in USERS):
-            flash('Email already registered', 'danger')
-            return redirect(url_for('register'))
+        
+        # Check if user already exists
+        existing_user = next((u for u in USERS if u['email'] == email), None)
+        if existing_user:
+            flash('Email already registered. Please login.', 'danger')
+            return redirect(url_for('login'))
+        
+        # Generate verification token
+        token = serializer.dumps(email, salt='email-verify')
+        
+        # Save user - NOT VERIFIED YET, NOT LOGGED IN
         USERS.append({
             'id': len(USERS) + 1,
             'name': name,
             'email': email,
-            'password': password,
+            'password': password,  # In production, hash this!
             'is_admin': False,
+            'is_verified': False,  # Important: Not verified yet
             'created_at': datetime.now().isoformat()
         })
-        session['user'] = email
-        session['user_name'] = name
-        flash(f'Account created! Welcome {name}!', 'success')
-        return redirect(url_for('home'))
+        
+        # Send verification email
+        email_sent = send_verification_email(email, name, token)
+        
+        if email_sent:
+            flash(f'✅ Registration successful! A verification link has been sent to {email}.', 'success')
+            flash('Please check your email and click the verification link to activate your account.', 'info')
+        else:
+            flash('⚠️ Account created but verification email failed. Please contact support.', 'warning')
+        
+        # IMPORTANT: Do NOT log the user in here
+        return redirect(url_for('login'))
+    
     return render_template('register.html')
+
+
+@app.route('/verify-email/<token>')
+def verify_email(token):
+    try:
+        email = serializer.loads(token, salt='email-verify', max_age=86400)  # 24 hours
+        
+        # Find and verify the user
+        user = None
+        for u in USERS:
+            if u['email'] == email:
+                user = u
+                break
+        
+        if not user:
+            flash('User not found.', 'danger')
+            return redirect(url_for('register'))
+        
+        if user.get('is_verified', False):
+            flash('Email already verified. You can now login.', 'info')
+            return redirect(url_for('login'))
+        
+        # Mark user as verified
+        user['is_verified'] = True
+        
+        # Send welcome email
+        send_welcome_email(email, user.get('name', 'Customer'))
+        
+        flash('🎉 Email verified successfully! Your account is now active.', 'success')
+        flash('You can now login to your account.', 'info')
+        return redirect(url_for('login'))
+        
+    except Exception as e:
+        print(f"Verification error: {e}")
+        flash('The verification link is invalid or has expired. Please request a new one.', 'danger')
+        return redirect(url_for('resend_verification'))
+
 
 @app.route('/logout')
 def logout():
